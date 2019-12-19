@@ -16,7 +16,7 @@ class InvertedIndex:
         self.inverted_index = dict()
 
         try:
-            if indexPath is not None:
+            if args.load_inverted_index:
                 # print(type(indexPath))
                 if os.path.exists(indexPath):
                     with open(indexPath, 'r') as fin:
@@ -35,11 +35,10 @@ class InvertedIndex:
         forward_index = dict()
         for i in D:
             if args.extract_keywords:
-                print('extract keywords')
-                tmp = analyse.extract_tags(D[i], topK=1)
+                tmp = analyse.extract_tags(D[i], topK=20)
             else:
                 tmp = jieba.lcut_for_search(D[i])
-            forward_index.setdefault(i, [w.strip() for w in tmp if w not in self.stopwords])
+            forward_index.setdefault(i, [w.strip() for w in tmp if w not in self.stopwords and len(w.strip()) > 0])
         return forward_index
 
 
@@ -60,14 +59,12 @@ class TagIndex:
     def __init__(self, indexPath=args.tag_index_path):
         self.tag_index = dict()
         try:
-            if indexPath is not None:
+            if args.load_tag_index:
                 if os.path.exists(indexPath):
                     with open(indexPath, 'r') as fin:
                         self.tag_index = json.load(fin)
         except Exception as e:
             self.tag_index = dict()
-
-
 
     def update_tag_index(self, D):
         for i in D:
@@ -122,4 +119,5 @@ if __name__ == '__main__':
     D2.setdefault(3, ',')
     tagIndex.update_tag_index(D2)
     print(invertedIndex.inverted_index)
+    print(tagIndex.tag_index)
 
