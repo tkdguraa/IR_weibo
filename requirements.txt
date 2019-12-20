@@ -3,3 +3,6 @@ numpy
 scipy
 bert-serving-server
 bert-serving-client
+django
+mongoengine
+emoji
