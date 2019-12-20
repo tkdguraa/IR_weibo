@@ -6,6 +6,8 @@ import numpy as np
 from numpy.linalg import norm
 from scipy.stats import entropy
 
+from inverted_index import InvertedIndex, TagIndex
+
 # load config file
 with open('config.json', 'r') as f:
     config = json.load(f)
@@ -22,29 +24,26 @@ def preprocess(texts):
         D.append(tokens)
     return D
 
-# Filter documents without keywords that overlap with the original query
-def remove_no_overlap(Q, D):
-    q_tokens = set(preprocess(Q)[0])
-    print('orig q_tokens:', q_tokens)
-    useful_idxs = []
-    for idx, d in enumerate(D):
-        if any(token in d for token in q_tokens):
-            useful_idxs.append(idx)
-    return useful_idxs
+# Find documents that overlaps with keywords of original query
+# return [post_id]
+def get_candidates(Q):
+    invertedIndex = InvertedIndex()
+    return invertedIndex.search(Q)
 
-def leave_useful_info(useful_idxs, D, lines):
-    newD, post_ids, mbranks, uranks = [], [], [], []
-    for idx in useful_idxs:
-        newD.append(D[idx])
-        post_ids.append(lines[idx]['post_id'])
-        mbranks.append(lines[idx]['user']['mbrank'])
-        uranks.append(lines[idx]['user']['urank'])
-    return newD, post_ids, mbranks, uranks
+def get_corpus(post_ids, D, lines):
+    newD, mbranks, uranks = [], [], []
+    for post_id in post_ids:
+        idx = post_ids.index(post_id)
+        if len(D[idx]) > 0:
+            newD.append(D[idx])
+            mbranks.append(lines[idx]['user']['mbrank'])
+            uranks.append(lines[idx]['user']['urank'])
+    return newD, mbranks, uranks
 
 ##### Query Expansion #####
 # info_type also can be 'snippet'
 def query_expansion(Q, info_type='title', flag=True):
-    if flag is False: return Q
+    if flag is False: return set(preprocess(Q)[0])
 
     url = 'https://www.googleapis.com/customsearch/v1?key=' + config['GoogleAPIKey'] \
         + '&cx=' + config['GoogleCX'] \
@@ -58,6 +57,7 @@ def query_expansion(Q, info_type='title', flag=True):
     print('expanded:', expanded)
 
     newQ = [' '.join(Q + expanded)]
+    newQ = set(preprocess(Q)[0])
     return newQ
 
 def get_topN_idxs(scores, topN):
