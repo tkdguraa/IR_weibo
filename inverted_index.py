@@ -63,6 +63,8 @@ class InvertedIndex:
         res.sort(reverse=True)
         return res
 
+    # def update(self):
+
 
 class TagIndex:
 

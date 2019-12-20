@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'SOUWEIBO',
     'mongoengine',
-    'django_celery_beat',
+    # 'django_celery_beat',
 ]
 
 
@@ -81,6 +81,11 @@ WSGI_APPLICATION = 'SOUMBLOG.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': None,
+        'NAME': 'weibodata',
+        'USER': 'weibo',
+        'PASSWORD': 'weibo',
+        'HOST': '127.0.0.1',
+
         # 'ENGINE': 'django.db.backends.sqlite3',
         # 'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     },
