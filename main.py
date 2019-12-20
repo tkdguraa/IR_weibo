@@ -2,11 +2,20 @@
 import json
 import pickle
 import requests
-from math import log10
-from scipy.stats import entropy
-from numpy.linalg import norm
 import jieba
+from math import log10
 import numpy as np
+from numpy.linalg import norm
+from scipy.stats import entropy
+from scipy.spatial import distance
+from bert_serving.client import BertClient
+
+# load config file
+with open('config.json', 'r') as f:
+    config = json.load(f)
+
+bc = BertClient()
+
 
 ##### Preprocessing #####
 def preprocess(D):
@@ -19,6 +28,15 @@ def preprocess(D):
         new_d = ' '.join(new_tokens)
         newD.append(new_d)
     return newD
+
+##### Feature Extraction - BERT #####
+def BERT_encoder(D):
+    D_vectors = bc.encode(D)
+    return D_vectors
+
+##### Compute similarity - cosine similarity #####
+def similarity_score(v1, v2):
+    return distance.cosine(v1, v2)
 
 ##### Feature Extraction #####
 # t is token
@@ -89,8 +107,11 @@ def is_redundant(resD, d):
 
 ##### Query Expansion #####
 def query_expansion(Q):
-    url = 'https://www.googleapis.com/customsearch/v1?key=AIzaSyAOHDjhrr2Nw_MjGjVc6cXrEQvloAoheQ8&cx=001973889481213002304:fyj4dfwhre9&alt=json&q=' + Q[0]
+    url = 'https://www.googleapis.com/customsearch/v1?key=' + config['GoogleAPIKey'] \
+        + '&cx=' + config['GoogleCX'] \
+        + '&alt=json&q=' + Q[0]
     headers = {'content-type': 'application/json', 'Accept-Charset': 'UTF-8'}
+
     response = requests.get(url, headers=headers)
     r = json.loads(response.text)
     items = r['items']
@@ -120,8 +141,6 @@ if __name__ == '__main__':
             except EOFError:
                 break
             lines.append(line)
-#    with open('tweets.json', encoding='utf8') as f:
-#        lines = json.load(f)
     print(len(lines))
 
     # preprocess documents
@@ -136,24 +155,23 @@ if __name__ == '__main__':
     D = remove_no_overlap(orig_Q, D)
     print('len(D):', len(D))
 
-#    print(OS(D[0], D[1]))
-    topN = 10
+    topN = 10    # num of documents to return
+    results = [] # the array of search results to return
+    # number of candidate documents is smaller than output documents number
     if len(D) <= topN:
         for d in D: print(d)
+        results = [d for d in D]
     else:
-        tfidf = TFIDF(D)
-        D_vectors = []
-        for d in tfidf.fit(D):
-            D_vectors.append([t[1] for t in d])
+        # Feature extraction: convert document to vector
+        D_vectors = BERT_encoder(D)
+        Q_vector = BERT_encoder(Q)
 
-        Q_vector = [t[1] for t in (tfidf.fit(Q)[0])]
-
-        scores = []
-        for d_vector in D_vectors:
-            scores.append(JSD(Q_vector, d_vector))
-
-        scores = np.array(scores)
+        # Estimate the degree of similarity between query and documents
+        scores = np.array([similarity_score(d_vector, Q_vector) for d_vector in D_vectors])
         print('scores:', scores)
+
+        # sort
         topN_idx = scores.argsort()[:topN]
         for idx in topN_idx:
             print(D[idx], scores[idx])
+        results = [D[idx] for idx in topN_idx]
