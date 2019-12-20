@@ -1,0 +1,171 @@
+{% load static %}
+<html>
+  <head>
+    <meta name="referrer" content="no-referrer" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="author" content="colorlib.com">
+    <link href="https://fonts.googleapis.com/css?family=Poppins" rel="stylesheet" />
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+
+  </head>
+  <body>
+    <div class="s003" id="total">
+      <form id="search_box">
+        <div class="inner-form">
+          <div class="input-field second-wrap">
+            <input id="search" type="text" placeholder="Enter Keywords?" />
+          </div>
+          <div class="input-field third-wrap" id = "go">
+            <button class="btn-search" type="button" >
+              <svg class="svg-inline--fa fa-search fa-w-16" aria-hidden="true" data-prefix="fas" data-icon="search" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                <path fill="currentColor" d="M505 442.7L405.3 343c-4.5-4.5-10.6-7-17-7H372c27.6-35.3 44-79.7 44-128C416 93.1 322.9 0 208 0S0 93.1 0 208s93.1 208 208 208c48.3 0 92.7-16.4 128-44v16.3c0 6.4 2.5 12.5 7 17l99.7 99.7c9.4 9.4 24.6 9.4 33.9 0l28.3-28.3c9.4-9.4 9.4-24.6.1-34zM208 336c-70.7 0-128-57.2-128-128 0-70.7 57.2-128 128-128 70.7 0 128 57.2 128 128 0 70.7-57.2 128-128 128z"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <br>
+      </form>
+    </div>
+    {% comment %} <script src="{% static 'js/extention/choices.js' %}"></script> {% endcomment %}
+    <script src='//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js' type='text/javascript'></script>
+    <script>
+        var data_list = {{datas|safe}}
+        var i = 0
+        var post_id = "4448077517292156"
+        var text = "一会见<span class=\"url-icon\"><img alt=[酷] src=\"//h5.sinaimg.cn/m/emoticon/icon/default/d_ku-6fa1a42f7b.png\" style=\"width:1em; height:1em;\" /></span><span class=\"url-icon\"><img alt=[酷] src=\"//h5.sinaimg.cn/m/emoticon/icon/default/d_ku-6fa1a42f7b.png\" style=\"width:1em; height:1em;\" /></span><span class=\"url-icon\"><img alt=[酷] src=\"//h5.sinaimg.cn/m/emoticon/icon/default/d_ku-6fa1a42f7b.png\" style=\"width:1em; height:1em;\" /></span> "
+        var pics = ["https://wx2.sinaimg.cn/orj360/007dMLSxly1g9rnuom0edj30gr0c075h.jpg",
+          "https://wx2.sinaimg.cn/orj360/007dMLSxly1g9rnuq09ixj30jg0ffar4.jpg",
+          "https://wx4.sinaimg.cn/orj360/007dMLSxly1g9rnurq97bj30jg0dp4ah.jpg",
+          "https://wx4.sinaimg.cn/orj360/007dMLSxly1g9rnuucckpj30jg0db17l.jpg",
+          "https://wx1.sinaimg.cn/orj360/007dMLSxly1g9rnuuw0lqj30dq09iq6m.jpg"]
+        var image = "https://wx3.sinaimg.cn/orj480/007dMLSxly8g91zs33ujoj30u00u0jvl.jpg"
+        var screen_name = "综艺达人胡艺凡"
+        var retweet_count = 49
+        var like = 605
+
+        $(document).ready(function(){
+            var current = window.location.pathname.substr(27); 
+            console.log(current)
+            if(data_list.length != 0){
+              //$("#search_box")[0].style.marginTop = "-20%"
+              var tweeter_total_num = {{number|safe}}
+              var words = data_list[0]['search']
+              $("#search_box").append("<div class=result></div>")
+              for(i = 0; i < 5; i++){
+                var post_id = data_list[i]['post_id']
+                var text = data_list[i]['origin_text']
+                var pics = data_list[i]['pics']
+                var image = data_list[i]['user']['image']
+                var screen_name = data_list[i]['user']['screen_name']
+                var retweet_count = data_list[i]['retweet_count']
+                var like = data_list[i]['like']
+                $("div.result").append("<br></br>")
+                $("div.result").append("<div class=tweeter " + "id=tw" + i + ">" + "<div class=profile><img src=" + image + " class = image><div class=name>" + screen_name + "</div></div>" + "</div>")
+                $("#tw" + i).append("<br>")
+                $("#tw" + i).append("<div class=text>" + text + "</div>")
+                $("#tw" + i).append("<br>")
+                $("#tw" + i).append("<div class=pics id = " + i + "></div>")
+                $("#tw" + i).append("<br>")
+                $("#tw" + i).append("<div class=info> 转发" + retweet_count + " &nbsp;&nbsp;&nbsp;&nbsp;点赞 " + like + "</div>")
+
+                for(j = 0; j < pics.length; j++){
+                  $("#" + i).append("<img src=" + pics[j] + " class = pictures>")
+                }
+              }
+              $("div.result").append("<br></br>")
+              $("div.result").append("<div class=page></div>")
+            }
+            $("div.tweeter").click(function(){
+              window.location.href="https://m.weibo.cn/detail/" + data_list[this.id.substr(2)]['post_id']
+            });
+            $("#go").click(function(){
+              window.location.href="/search/" + $("#search").val() + "/1" 
+            });
+            cnt_limit = 0
+            now_page = 0
+            page_num = parseInt(tweeter_total_num / 15);
+            page_list = parseInt(page_num / 5);
+            if(now_page > 0)      
+              $('.page').append("<a href='javascript:void(0);' id='prev'>上一页&nbsp&nbsp&nbsp</a>");
+            for(var i = (now_page * 5); i <= page_num; i++){
+              $('div.page').append("<a class='pagenum' href='javascript:void(0);' id=P" + ( i + 1 ) + ">" + (i + 1) + "&nbsp&nbsp&nbsp</a>");
+              if(cnt_limit == 4){
+                break;
+              }
+              cnt_limit++;
+            }
+            $('#P' + current).css('color','black');
+            if(parseInt(page_list) > now_page)
+              $('div.page').append("<a href='javascript:void(0);' id=next>下一页</a>");
+            
+            $(document).on('click','#prev',function(){
+              now_page--;
+              cnt_limit = 0;
+              $('.page').empty();
+              window.location = '/msglist/page/' + (current - 1);
+            });
+            $(document).on('click','.pagenum',function(){
+              $('.pagenum').each(function(){
+                $(this).css('color','');
+              });
+              $(this).css('color','black');
+              window.location = '/search/' + words + '/' + this.id.substr(1);
+            });
+        });
+    </script>
+    <style type="text/css">
+        div.result{
+          background: #d5d9db;
+          width: 100%;
+          text-align: center;
+          color: black;
+          border-radius: 20px;
+        }
+        div.text{
+          text-align:left;
+          margin-left:2%;
+        }
+        div.tweeter {
+          background: white;
+          width: 90%;
+          margin-left:5%;
+          text-align: center;
+          color: black;
+          border-radius: 20px;
+        }
+        div.profile{
+          width:10%;
+          margin-left:0px;
+        }
+        img.image{
+          width: 50px;
+          height: 50px;
+          margin-top:5%;
+          border-radius: 100%;
+        }
+        div.name{
+          position: absolute;
+          margin-left:70px;
+          margin-top:-1.8%;
+        }
+        div.pics{
+          text-align:left;
+        }
+        div.info{
+          text-align:right;
+          margin-right:5%;
+        }
+        img.pictures{
+          width:150px;
+          height:150px;
+          margin-left:3%;
+          margin-top:3%;
+        }
+        a{
+          text-decoration: none;
+        }
+    </style>
+  </body><!-- This templates was made by Colorlib (https://colorlib.com) -->
+</html>
