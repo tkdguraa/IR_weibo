@@ -7,9 +7,9 @@ import jieba
 class BM25(object):
     def __init__(self, docs):
         self.D = len(docs)
-        self.avgdl = sum([len(docs[doc_id]) + 0.0 for doc_id in docs]) / self.D
+        self.avgdl = sum([len(doc) + 0.0 for doc in docs]) / self.D
         self.docs = docs
-        self.f = dict()  # 列表的每一个元素是一个dict，dict存储着一个文档中每个词的出现次数
+        self.f = list()  # 列表的每一个元素是一个dict，dict存储着一个文档中每个词的出现次数
         self.df = dict() # 存储每个词及出现了该词的文档数量
         self.idf = dict() # 存储每个词的idf值
         self.k1 = 1.5
@@ -17,28 +17,28 @@ class BM25(object):
         self.init()
 
     def init(self):
-        for doc_id in self.docs:
+        for doc in self.docs:
             tmp = dict()
-            for word in self.docs[doc_id]:
+            for word in doc:
                 tmp[word] = tmp.get(word, 0) + 1  # 存储每个文档中每个词的出现次数
-            self.f.setdefault(doc_id, tmp)
+            self.f.append(tmp)
             for k in tmp.keys():
                 self.df[k] = self.df.get(k, 0) + 1 # 存储每个词在几篇文档中出现
         for k, v in self.df.items():
             self.idf[k] = math.log(self.D - v + 0.5) - math.log(v + 0.5)
-        print(self.f)
-        print(self.df)
-        print(self.idf)
+        #print(self.f)
+        #print(self.df)
+        #print(self.idf)
 
-    def sim(self, query, doc_id):
+    def sim(self, query, index):
         # 简化算法， (k2+1)*qfi/(k2+qfi)  qfi为查询词在query中的词频，
         score = 0
         for word in query:
-            if word not in self.f[doc_id]:
+            if word not in self.f[index]:
                 continue
-            d = len(self.docs[doc_id])
-            score += (self.idf[word] * self.f[doc_id][word] * (self.k1 + 1)
-                      / (self.f[doc_id][word] + self.k1 * (1 - self.b + self.b * d
+            d = len(self.docs[index])
+            score += (self.idf[word] * self.f[index][word] * (self.k1 + 1)
+                      / (self.f[index][word] + self.k1 * (1 - self.b + self.b * d
                                                       / self.avgdl)))
         return score
 
@@ -46,10 +46,10 @@ class BM25(object):
     # 后的得分score，总共有多少篇推文，scores列表就有多少项，
     # 每一项为推文与query的相似度得分
     def simall(self, query):
-        scores = dict()
-        for doc_id in self.docs:
-            score = self.sim(query, doc_id)
-            scores.setdefault(doc_id, score)
+        scores = list()
+        for i in range(self.D):
+            score = self.sim(query, i)
+            scores.append(score)
         return scores
 
 
@@ -58,25 +58,6 @@ def bm25(doc_tokens, query_tokens):
     bm = BM25(doc_tokens)
     scores = bm.simall(query_tokens)
     return scores
-
-
-def metric_max_over_ground_truths(metric_fn, prediction, ground_truths):
-    """
-    This function calculates and returns the precision, recall and f1-score
-    Args:
-        metric_fn: metric function pointer which calculates scores according to corresponding logic.
-        prediction: prediction string or list to be matched
-        ground_truth: golden string or list reference
-    Returns:
-        floats of (p, r, f1)
-    Raises:
-        None
-    """
-    scores_for_ground_truths = []
-    for ground_truth in ground_truths:
-        score = metric_fn(prediction, ground_truth)
-        scores_for_ground_truths.append(score)
-    return max(scores_for_ground_truths)
 
 
 
@@ -110,20 +91,20 @@ def precision_recall_f1(prediction, ground_truth):
 
 
 def f1_score(doc_tokens, query_tokens):
-    scores = dict()
+    scores = list()
     if len(query_tokens) > 0:
-        for doc_id in doc_tokens:
-            related_score = precision_recall_f1(doc_tokens[doc_id], query_tokens)[2]
-            scores.setdefault(doc_id, related_score)
+        for dt in doc_tokens:
+            related_score = precision_recall_f1(dt, query_tokens)[2]
+            scores.append(related_score)
     return scores
 
 
 def recall(doc_tokens, query_tokens):
-    scores = dict()
+    scores = list()
     if len(query_tokens) > 0:
-        for doc_id in doc_tokens:
-            related_score = precision_recall_f1(doc_tokens[doc_id], query_tokens)[1]
-            scores.setdefault(doc_id, related_score)
+        for dt in doc_tokens:
+            related_score = precision_recall_f1(dt, query_tokens)[1]
+            scores.append(related_score)
     return scores
 
 
@@ -136,8 +117,9 @@ if __name__ == "__main__":
     1.@扬帆向北 新鲜事，《5G动态追踪》传送门➡http://t.cn/EbY47Yz\
     2.@微博房产报道 新鲜事，《致敬时代力量2019微博房产影响力峰会圆满举行》传送门➡http://t.cn/AiDe1UK7\
     3.@UXlab 新鲜事，《优秀UI设计都在这儿》传送门➡http://t.cn/Rm5iPWW'
-    w3 = '哈时间的话卡死关晓彤吴刚， hello, hahahha, 哈哈哈'
+    w3 = '吴刚哈时间的话卡死， hello, hahahha, 哈哈哈'
     query_tokens = jieba.lcut_for_search(query)
+    # ['关键系'， 'sdfs']
     w1_tokens = jieba.lcut_for_search(w1)
     w2_tokens = jieba.lcut_for_search(w2)
     w3_tokens = jieba.lcut_for_search(w3)
@@ -147,10 +129,16 @@ if __name__ == "__main__":
     print(w3_tokens)
     '''
 
-    doc_tokens = dict()
-    doc_tokens.setdefault(1, w1_tokens)
-    doc_tokens.setdefault(2, w2_tokens)
-    doc_tokens.setdefault(3, w3_tokens)
-    res = f1_score(doc_tokens, query_tokens)
-    print(res)
+    doc_tokens = list()
+    doc_tokens.append(w1_tokens)
+    doc_tokens.append(w2_tokens)
+    doc_tokens.append(w3_tokens)
+    # [['fsdfs','sdfs'], []]
+    # [121,42342]
+    f1 = f1_score(doc_tokens, query_tokens)
+    recall_score = recall(doc_tokens, query_tokens)
+    bm25_score = bm25(doc_tokens, query_tokens)
+    print(f1)
+    print(recall_score)
+    print(bm25_score)
 
