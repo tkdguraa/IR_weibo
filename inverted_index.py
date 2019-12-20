@@ -54,6 +54,15 @@ class InvertedIndex:
 
         self.save_index()
 
+    def search(self, Q):
+        res = set()
+        for q in Q:
+            if q in self.inverted_index:
+                res.update(self.inverted_index[q])
+        res = list(res)
+        res.sort(reverse=True)
+        return res
+
 
 class TagIndex:
 
@@ -83,6 +92,16 @@ class TagIndex:
     def save_index(self, indexPath=args.tag_index_path):
         with open(indexPath, 'w') as fout:
             json.dump(self.tag_index, fout, ensure_ascii=False)
+
+    def search(self, Q):
+        res = set()
+        for q in Q:
+            if q in self.tag_index:
+                res.update(self.tag_index[q])
+        res = list(res)
+        res.sort(reverse=True)
+        return res
+
 
 
 class JsonEncoder(json.JSONEncoder):
@@ -121,4 +140,5 @@ if __name__ == '__main__':
     tagIndex.update_tag_index(D2)
     print(invertedIndex.inverted_index)
     print(tagIndex.tag_index)
+    print(invertedIndex.search(['关晓彤']))
 

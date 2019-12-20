@@ -9,6 +9,7 @@ from numpy.linalg import norm
 from scipy.stats import entropy
 from scipy.spatial import distance
 from bert_serving.client import BertClient
+from inverted_index import InvertedIndex, TagIndex
 
 # load config file
 with open('config.json', 'r') as f:
@@ -131,6 +132,9 @@ def OS(d, q):
 
 # Filter documents without keywords that overlap with query
 def remove_no_overlap(Q, D):
+    invertedIndex = InvertedIndex()
+    return invertedIndex.search(Q)
+    '''
     q_tokens = set(preprocess(Q)[0].split())
     print('orig q_tokens:', q_tokens)
     newD = []
@@ -138,6 +142,7 @@ def remove_no_overlap(Q, D):
         if any(token in d for token in q_tokens):
             newD.append(d)
     return newD
+    '''
 
 if __name__ == '__main__':
     with open('tweets.pickle', 'rb') as f:
