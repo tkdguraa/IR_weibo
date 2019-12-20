@@ -1,8 +1,37 @@
 # -*- coding: utf-8 -*-
-
 import math
-from collections import Counter
 import jieba
+from collections import Counter
+from scipy.spatial import distance
+from bert_serving.client import BertClient
+
+class BERT(object):
+    def __init__(self):
+        self.bc = BertClient()
+
+    """ Feature Extraction """
+    def encoder(self, D):
+        D_vectors = self.bc.encode(D)
+        return D_vectors
+
+    """
+    Compute cosine similarity
+    The score ranges from 0 to 2. 2 means most similar
+    """
+    def cosine_similarity(self, D_vectors, Q_vector):
+        return [2 - distance.cosine(d_vector, Q_vector) for d_vector in D_vectors]
+
+    def score(self, doc_tokens, query_tokens):
+        D = [' '.join(tokens) for tokens in doc_tokens]
+        Q = [' '.join(query_tokens)]
+        D_vectors = self.encoder(D)
+        Q_vector = self.encoder(Q)
+        return self.cosine_similarity(D_vectors, Q_vector)
+
+def BERT_score(doc_tokens, query_tokens):
+    bert = BERT()
+    scores = bert.score(doc_tokens, query_tokens)
+    return scores
 
 class BM25(object):
     def __init__(self, docs):
@@ -54,7 +83,6 @@ class BM25(object):
 
 
 def bm25(doc_tokens, query_tokens):
-
     bm = BM25(doc_tokens)
     scores = bm.simall(query_tokens)
     return scores
