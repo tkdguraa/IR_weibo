@@ -10,7 +10,7 @@ from bert_serving.client import BertClient
 
 class BERT_embedding(object):
     def __init__(self):
-        self.bc = BertClient(ip='166.111.80.50')
+        self.bc = BertClient()
 
     """
     Feature Extraction
