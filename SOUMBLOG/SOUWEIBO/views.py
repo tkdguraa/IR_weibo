@@ -1,19 +1,69 @@
 # -*- coding: utf-8 -*-
+import sys
+sys.path.append('..')
 
-import pickle
 from SOUWEIBO.models import tweeter
 import os
 from django.shortcuts import render
 from django.http.response import HttpResponse
-from SOUMBLOG.SOUWEIBO.search_engine import get_result
 import json
-import time
-import requests
-import _thread
 os.environ['DJANGO_SETTINGS_MODULE'] = 'SOUMBLOG.settings'
-from SOUWEIBO.crawler_theme import auto_search
-from SOUWEIBO.crawler_theme import get_parse
+from IR_weibo.relevance import similarity_score
+from IR_weibo.utils import preprocess, get_candidates, extract_info, query_expansion, overall_score, get_topN_idxs
 
+
+"""
+main search algorithm
+Q:         query string
+algorithm: one of 'bert', 'f1', 'recall', 'bm25'
+topN:      number of tweets to return
+is_qe:     whether to expand query
+additional_attrs: attributes to consider when ranking
+return [post_id]
+"""
+def search(Q_str, algorithm='bert', topN=10, is_qe=False,
+           additional_attrs=['retweet_count', 'followers_count']):
+    # query expansion & preprocess query
+    Q_str = '电视剧电影'
+    Q = query_expansion(Q_str, 'title', is_qe)
+    print('Q', Q)
+
+    # find tweets that overlaps with keywords of original query
+    # TODO
+    # post_ids = get_candidates(Q)
+
+    invi = tweeter.objects.filter(theme='游戏')
+    post_ids = []
+    for i in range(0,10):
+        obj = invi[i]
+        post_ids.append(obj['post_id'])
+    # print(type(post_ids[0]))
+    # num = tweeter.objects.filter(post_id=str(post_ids[0]))
+    # print("www", len(num))
+    # print("posts", post_ids)
+
+    tweets = load_tweets_from_db(post_ids)
+
+    # extract text
+    texts = extract_info(tweets, 'text')
+
+    # preprocess texts
+    D = preprocess(texts)
+
+    # number of candidate documents is smaller than output documents number
+    if len(D) <= topN:
+        return  post_ids
+
+    # estimate the degree of similarity between query and documents
+    scores = similarity_score(D, Q, algorithm)
+
+    # compute overall scores including popularity
+    overall_scores = overall_score(scores, tweets, ['retweet_count', 'followers_count'])
+
+    # sort
+    topN_idxs = get_topN_idxs(overall_scores, topN)
+    results = [post_ids[idx] for idx in topN_idxs]
+    return results
 
 # Create your views here.
 def search_interface(request):
@@ -24,10 +74,35 @@ def update_data(request):
     #这里写倒排文档等更新函数
     return HttpResponse("ok")
 
-def search(request, words, page):
+def load_tweets_from_db(post_id):
+    data_list = []
+    for id in post_id:
+        print("hello", id)
+        invi = tweeter.objects.filter(post_id = id)
+        print("here",invi)
+        try:
+            data = {
+                "character_count": invi['character_count'],
+                "like": invi['collect_count'],
+                "hash": invi['hash'],
+                "origin_text": invi['origin_text'],
+                "post_id": invi['post_id'],
+                "retweet_count": invi['retweet_count'],
+                "text": invi['text'],
+                "theme": invi['theme'],
+                "pics": invi['pics'],
+                "user": invi['user'],
+            }
+            data_list.append(data)
+        except:
+            continue
+    return data_list
+
+def click_search(request, words, page):
     # print(request.POST.get('words'))
-    invi = get_result(words,topN=100)
-    invi = tweeter.objects.filter(theme = words)
+
+    invi = search(words, algorithm='bm25', topN=100, is_qe=False)
+
     print(len(invi))
     data_list = []
     if len(invi) <= 5:
