@@ -82,7 +82,7 @@ if __name__ == '__main__':
         results = post_ids
     else:
         # Estimate the degree of similarity between query and documents
-        scores = similarity_score(D, Q, 'bert')
+        scores = similarity_score(D, Q, 'bm25')
 
         # Compute overall score including popularity
         overall_scores = overall_score(scores, lines, ['retweet_count', 'followers_count'])

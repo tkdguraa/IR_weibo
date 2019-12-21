@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import json
 import pickle
-from SOUWEIBO.models import tweeter
+from models import tweeter
 
 from relevance import similarity_score
 from utils import preprocess, get_candidates, extract_info, query_expansion, overall_score, get_topN_idxs
