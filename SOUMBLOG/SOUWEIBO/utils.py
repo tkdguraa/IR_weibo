@@ -1,10 +1,10 @@
 import json
+import random
 import requests
 import jieba
 from math import log10
 import numpy as np
 from numpy.linalg import norm
-from scipy.stats import entropy
 
 from inverted_index import InvertedIndex, TagIndex
 
@@ -20,7 +20,8 @@ def preprocess(texts):
     D = []
     for text in texts:
         # remove stopwords
-        tokens = [token.strip() for token in (jieba.lcut_for_search(text)) if token not in stopwords]
+        tokens = [token.strip() for token in (jieba.lcut_for_search(text)) if token not in stopwords and len(token.strip()) is not 0]
+        if tokens == []: tokens = ['。'] # tokens cannot be empty
         D.append(tokens)
     return D
 
@@ -29,6 +30,12 @@ def preprocess(texts):
 def get_candidates(Q):
     invertedIndex = InvertedIndex()
     return invertedIndex.search(Q)
+
+def extract_info(tweets, attr):
+    try:
+        return [tweet[attr] for tweet in tweets]
+    except:
+        return [tweet['user'][attr] for tweet in tweets]
 
 def get_corpus(post_ids, D, lines):
     newD, mbranks, uranks = [], [], []
@@ -40,35 +47,46 @@ def get_corpus(post_ids, D, lines):
             uranks.append(lines[idx]['user']['urank'])
     return newD, mbranks, uranks
 
-##### Query Expansion #####
+flatten = lambda l: [item for sublist in l for item in sublist]
+
+# Query Expansion
 # info_type also can be 'snippet'
-def query_expansion(Q, info_type='title', flag=True):
-    if flag is False: return set(preprocess(Q)[0])
+def query_expansion(Q_str, info_type='title', flag=True, max_q_len=20):
+    if flag is False: return set(preprocess([Q_str])[0])
+
+    Q = set(preprocess([Q_str])[0])
+    if len(Q) >= max_q_len: return Q
 
     url = 'https://www.googleapis.com/customsearch/v1?key=' + config['GoogleAPIKey'] \
         + '&cx=' + config['GoogleCX'] \
-        + '&alt=json&q=' + Q[0]
+        + '&alt=json&q=' + Q_str
     headers = {'content-type': 'application/json', 'Accept-Charset': 'UTF-8'}
 
     response = requests.get(url, headers=headers)
     r = json.loads(response.text)
     items = r['items']
     expanded = [item[info_type] for item in items]
-    print('expanded:', expanded)
+    expanded_Q = set(flatten(preprocess(expanded)))
 
-    newQ = [' '.join(Q + expanded)]
-    newQ = set(preprocess(Q)[0])
+    len_to_expand = max_q_len - len(Q)
+    if len(expanded_Q) > len_to_expand:
+        expanded_Q = random.sample(expanded_Q, len_to_expand)
+
+    print('expanded_Q:', expanded_Q)
+    newQ = Q.union(expanded_Q)
     return newQ
 
 def get_topN_idxs(scores, topN):
-    return np.array(scores.argsort()[-topN:][::-1])
+    return np.array(scores).argsort()[-topN:][::-1]
 
-##### Compute overall score including popularity #####
-alpha = 0.01
-beta  = 0.001
-def overall_score(scores, mbranks, uranks):
-    return np.array([score + alpha*mbrank + beta*urank \
-            for score, mbrank, urank in zip(scores, mbranks, uranks)])
+# Compute overall score including popularity
+alpha = 0.1
+def overall_score(scores, tweets, attrs=[]):
+    for attr in attrs:
+        additional_scores = extract_info(tweets, attr)
+        normalized_scores = additional_scores / np.linalg.norm(additional_scores)
+        scores += alpha * normalized_scores
+    return scores
 
 ##### Feature Extraction - TFIDF #####
 # t is token
@@ -105,20 +123,3 @@ class TFIDF():
     def tfidf(t, d, D):
         tfidf = TFIDF.tf(t, d) * TFIDF.idf(t, D)
         return tfidf if tfidf > 0 else 0
-
-# Jensen-Shannon Divergence
-def JSD(d, q):
-    d = d / norm(d, ord=1)
-    q = q / norm(q, ord=1)
-    m = 0.5 * (d + q)
-    return 0.5 * (entropy(d, m) + entropy(q, m))
-
-# Overlap Similarity
-def OS(d, q):
-    set_d = set(d)
-    set_q = set(q)
-
-    overlap = set_d & set_q
-
-    return float(len(overlap) / len(d))
-
