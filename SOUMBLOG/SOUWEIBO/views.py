@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import pickle
 from SOUWEIBO.models import tweeter
 import os
@@ -67,3 +69,5 @@ def search(request, words, page):
     return render(request, 'SOUWEIBO/search_interface.html', {'datas': json.dumps(data_list), 'number': len(invi)})
 
 
+if __name__ == "__main__":
+    update_data('qwq')
