@@ -5,18 +5,14 @@ from collections import Counter
 from scipy.spatial import distance
 from bert_serving.client import BertClient
 
-relevance_algorithms = {
-    'bert':   BERT_score,
-    'bm25':   bm25,
-    'f1':     f1_score,
-    'recall': recall
-}
-
 class BERT_embedding(object):
     def __init__(self):
         self.bc = BertClient()
 
-    """ Feature Extraction """
+    """
+    Feature Extraction
+    convert document to vector
+    """
     def encoder(self, D):
         D_vectors = self.bc.encode(D)
         return D_vectors
@@ -142,6 +138,20 @@ def recall(doc_tokens, query_tokens):
             related_score = precision_recall_f1(dt, query_tokens)[1]
             scores.append(related_score)
     return scores
+
+
+def  similarity_score(D, Q, algorithm):
+    func = None
+    if algorithm == 'bert':
+        func = BERT_score
+    elif algorithm == 'bm25':
+        func = bm25
+    elif algorithm == 'f1':
+        func = f1_score
+    else:
+        func = recall
+
+    return func(D, Q)
 
 
 if __name__ == "__main__":
