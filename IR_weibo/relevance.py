@@ -154,7 +154,7 @@ def  similarity_score(D, Q, algorithm):
     else:
         func = recall
 
-    return func(D, Q)
+    return func(D, list(Q))
 
 
 if __name__ == "__main__":

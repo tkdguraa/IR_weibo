@@ -6,7 +6,6 @@ from pymongo import MongoClient
 import time
 import pickle
 import requests
-from .crawler_theme import get_parse
 
 #实时爬取数据
 def update_data(tweeter):
@@ -91,7 +90,9 @@ def update_data(tweeter):
 
 #直接读取data文件夹里的pickle文件到数据库
 def read_data(tweeter):
-    path =  open('data/emb_json4.pickle','rb')
+    path =  open('emb_json5.pickle','rb')
+    text_dict = {}
+    tag_dict = {}
     print("start")
     try:
         while True:
@@ -104,16 +105,19 @@ def read_data(tweeter):
             post_id = data['post_id']
             retweet_count = str(data['retweet_count'])
             text = data['text']
-            theme = data['theme']
+            theme_ = data['theme']
             pics = data['pics']
             user = data['user']
             if tweeter.find(filter={'post_id':post_id}).count() == 0:
-                tweeter.insert({'character_count': character_count, 'collect_count': collect_count, 
+                tweeter.insert({'character_count': character_count, 'collect_count': collect_count,
                                             'hash': hash, 'pics': pics, 'origin_text': origin_text, 'post_id': post_id, 'retweet_count': retweet_count, 'text': text, 'theme': theme_, 'user': user})
                 text_dict[post_id] = text
                 tag_dict[post_id] = hash
+                # print(text_dict)
     except:
         pass
+
+    print(tweeter.find().count())
 
     ##这里开始写更新倒排文档
 
@@ -123,13 +127,15 @@ if __name__ == "__main__":
     client = MongoClient('localhost',27017)
     
     #连接所需数据库,test为数据库名
-    db=client.mblogdb
+    db=client.weibodata
     
     #连接所用集合，也就是我们通常所说的表，test为表名
+
     collection=db.tweeter
     
     # for item in collection.find():
     # print(collection.count())
-    while 1:
-        update_data(collection)
-        time.sleep(300)
+    read_data(collection)
+    # while 1:
+    #     update_data(collection)
+    #     time.sleep(300)
