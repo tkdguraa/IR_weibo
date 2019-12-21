@@ -2744,7 +2744,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // Hide passed input
 	      this.passedElement.classList.add(this.config.classNames.input, this.config.classNames.hiddenState);
 
-	      // Remove element from tab index
+	      // Remove element from tab indexfile
 	      this.passedElement.tabIndex = '-1';
 
 	      // Backup original styles if any

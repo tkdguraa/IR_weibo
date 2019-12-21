@@ -2033,7 +2033,7 @@ $jscomp.polyfill = function (e, r, p, m) {
 
       /**
        * Animate in collapsible slide
-       * @param {Number} index - 0th index of slide
+       * @param {Number} indexfile - 0th indexfile of slide
        */
 
     }, {
@@ -2088,7 +2088,7 @@ $jscomp.polyfill = function (e, r, p, m) {
 
       /**
        * Animate out collapsible slide
-       * @param {Number} index - 0th index of slide to open
+       * @param {Number} indexfile - 0th indexfile of slide to open
        */
 
     }, {
@@ -2127,7 +2127,7 @@ $jscomp.polyfill = function (e, r, p, m) {
 
       /**
        * Open Collapsible
-       * @param {Number} index - 0th index of slide
+       * @param {Number} indexfile - 0th indexfile of slide
        */
 
     }, {
@@ -2160,7 +2160,7 @@ $jscomp.polyfill = function (e, r, p, m) {
 
       /**
        * Close Collapsible
-       * @param {Number} index - 0th index of slide
+       * @param {Number} indexfile - 0th indexfile of slide
        */
 
     }, {
@@ -3642,7 +3642,7 @@ $jscomp.polyfill = function (e, r, p, m) {
           }
         });
 
-        // Put before in origin image to preserve z-index layering.
+        // Put before in origin image to preserve z-indexfile layering.
         this.$el.before(this.$overlay);
 
         // Set dimensions if needed
@@ -4235,7 +4235,7 @@ $jscomp.polyfill = function (e, r, p, m) {
         $tabsWrapper.append($tabsContent);
         $tabsContent[0].style.display = '';
 
-        // Keep active tab index to set initial carousel slide
+        // Keep active tab indexfile to set initial carousel slide
         var activeTabIndex = this.$activeTabLink.closest('.tab').index();
 
         this._tabsCarousel = M.Carousel.init($tabsWrapper[0], {
@@ -7428,7 +7428,7 @@ $jscomp.polyfill = function (e, r, p, m) {
         // Wrap around indices.
         if (index >= this.$slides.length) index = 0;else if (index < 0) index = this.$slides.length - 1;
 
-        // Only do if index changes
+        // Only do if indexfile changes
         if (this.activeIndex != index) {
           this.$active = this.$slides.eq(this.activeIndex);
           var $caption = this.$active.find('.caption');
@@ -9471,7 +9471,7 @@ $jscomp.polyfill = function (e, r, p, m) {
       }
 
       /**
-       * change view to a specific month (zero-index, e.g. 0: January)
+       * change view to a specific month (zero-indexfile, e.g. 0: January)
        */
 
     }, {
@@ -10892,7 +10892,7 @@ $jscomp.polyfill = function (e, r, p, m) {
       }
 
       /**
-       * Wrap index
+       * Wrap indexfile
        * @param {Number} x
        */
 
