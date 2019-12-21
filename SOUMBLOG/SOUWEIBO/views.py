@@ -22,23 +22,6 @@ def update_data(request):
     #这里写倒排文档等更新函数
     return HttpResponse("ok")
 
-def get_complete_data(post_id):
-    invi = tweeter.objects.filter(post_id = post_id)
-    data = {
-        "character_count": invi['character_count'],
-        "like": invi['collect_count'],
-        "hash": invi['hash'],
-        "origin_text": invi['origin_text'],
-        "post_id": invi['post_id'],
-        "retweet_count": invi['retweet_count'],
-        "text": invi['text'],
-        "theme": invi['theme'],
-        "pics": invi['pics'],
-        "user": invi['user'],
-    }
-    print(invi[0])
-    return data
-
 def search(request, words, page):
     # print(request.POST.get('words'))
     invi = get_result(words,topN=100)

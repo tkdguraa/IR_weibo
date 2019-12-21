@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import json
 import pickle
+from SOUWEIBO.models import tweeter
 
 from relevance import similarity_score
 from utils import preprocess, get_candidates, extract_info, query_expansion, overall_score, get_topN_idxs
@@ -13,6 +14,23 @@ is_qe:     whether to expand query
 additional_attrs: attributes to consider when ranking
 return [post_id]
 """
+def load_tweets_from_db(post_id):
+    invi = tweeter.objects.filter(post_id = post_id)
+    data = {
+        "character_count": invi['character_count'],
+        "like": invi['collect_count'],
+        "hash": invi['hash'],
+        "origin_text": invi['origin_text'],
+        "post_id": invi['post_id'],
+        "retweet_count": invi['retweet_count'],
+        "text": invi['text'],
+        "theme": invi['theme'],
+        "pics": invi['pics'],
+        "user": invi['user'],
+    }
+    print(invi[0])
+    return data
+
 def get_result(Q_str, algorithm='bert', topN=10, is_qe=True,
            additional_attrs=['retweet_count', 'followers_count']):
     # query expansion & preprocess query
