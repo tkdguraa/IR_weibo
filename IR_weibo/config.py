@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import argparse as ap
 
+
 parser = ap.ArgumentParser()
 parser.add_argument('--inverted_index_path', default='./index/invertedIndex.txt', help='Data path for inverted index.', type=str)
 parser.add_argument('--tag_index_path', default='./index/tagIndex.txt', help='Data path for tag index.', type=str)
