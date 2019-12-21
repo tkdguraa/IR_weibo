@@ -1,11 +1,8 @@
 # -*- coding: utf-8 -*-
 import requests
-import string
-import json
 import re
 import os
 import time
-import random
 import emoji
 import pickle
 
