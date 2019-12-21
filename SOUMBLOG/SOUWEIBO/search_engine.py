@@ -13,7 +13,7 @@ is_qe:     whether to expand query
 additional_attrs: attributes to consider when ranking
 return [post_id]
 """
-def search(Q_str, algorithm='bert', topN=10, is_qe=True,
+def get_result(Q_str, algorithm='bert', topN=10, is_qe=True,
            additional_attrs=['retweet_count', 'followers_count']):
     # query expansion & preprocess query
     Q_str = '电视剧电影'
