@@ -24,10 +24,6 @@ theme_list = [
         "name": "情感"
     },
     {
-        "id": 4288,
-        "name": "明星"
-    },
-    {
         "id": 4188,
         "name": "社会"
     },
@@ -72,6 +68,7 @@ def update_data(tweeter):
                 if tweeter.find(filter={'post_id':post_id}).count() == 0:
                     data = get_parse(res.json()["data"]["cards"][i], theme["name"])
                     if data != []:
+                        print(data)
                         character_count = data['character_count']
                         collect_count = str(data['collect_count'])
                         hash = data['hash']

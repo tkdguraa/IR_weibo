@@ -115,6 +115,7 @@ def overall_score(scores, tweets, attrs=[]):
     for attr in attrs:
         additional_scores = np.array(extract_info(tweets, attr), dtype=np.int64)
         normalized_scores = additional_scores / np.linalg.norm(additional_scores)
+        print('normalized additional scores', normalized_scores)
         scores += alpha * normalized_scores
     return scores
 

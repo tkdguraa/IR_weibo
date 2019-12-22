@@ -24,7 +24,7 @@ additional_attrs: attributes to consider when ranking
 return [post_id]
 """
 def search(Q_str, algorithm='bert', topN=50, is_qe=False,
-           additional_attrs=['retweet_count', 'followers_count']):
+           additional_attrs=['retweet_count', 'followers_count', 'post_id']):
     # Query expansion & preprocess query
     Q = preprocess_query(Q_str, jieba.lcut_for_search)
     print('Q: ', Q)
@@ -57,7 +57,7 @@ def search(Q_str, algorithm='bert', topN=50, is_qe=False,
     scores = similarity_score(D, Q, algorithm)
 
     # Compute overall scores including popularity
-    overall_scores = overall_score(scores, tweets, ['retweet_count', 'followers_count'])
+    overall_scores = overall_score(scores, tweets, additional_attrs)
     # overall_scores = scores
 
     # Number of candidate documents is smaller than output documents number
@@ -116,8 +116,11 @@ def click_search(request, words, page, type):
     else:
         print("search NORMAL")
 
-        # Main Weibo Search API
-        invi = search(words, algorithm='bert', topN=50, is_qe=False)
+        """
+        Main Weibo Search API
+        """
+        invi = search(words, algorithm='bert', topN=50, is_qe=False,
+                      additional_attrs=['retweet_count', 'followers_count', 'post_id'])
 
         Q = preprocess_query(words, jieba.lcut_for_search)
         # print("before sort", Q)
