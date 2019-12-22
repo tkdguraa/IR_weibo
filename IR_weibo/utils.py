@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import sys, os
 sys.path.append('..')
 
@@ -157,3 +159,6 @@ class DESAdapter(HTTPAdapter):
         kwargs['ssl_context'] = context
         return super(DESAdapter, self).proxy_manager_for(*args, **kwargs)
 '''
+
+if __name__ == "__main__":
+    print(get_candidates(["足球"]))
