@@ -6,6 +6,7 @@ from pymongo import MongoClient
 import time
 import pickle
 import requests
+from IR_weibo.relevance import BERT_embedding
 from IR_weibo.inverted_index import InvertedIndex, TagIndex
 from IR_weibo.crawler_theme import get_parse
 
@@ -55,6 +56,7 @@ def update_data(tweeter):
     ]
     invertedIndex = InvertedIndex(newIndex=False)
     tagIndex = TagIndex(newIndex=False)
+    bert = BERT_embedding()
 
     for theme in theme_list:
         print('Search for %s' %theme['name'])
@@ -78,10 +80,12 @@ def update_data(tweeter):
                         pics = data['pics']
                         user = data['user']
                         if tweeter.find(filter={'post_id': post_id}).count() == 0:
-                            # TODO: bert
+                            D_vector = bert.encoder([text])[0]
                             tweeter.insert({'character_count': character_count, 'collect_count': collect_count,
-                                            'hash': hash, 'pics': pics, 'origin_text': origin_text, 'post_id': post_id, 'retweet_count': retweet_count, 'text': text, 'theme': theme_, 'user': user})
-                        
+                                            'hash': hash, 'pics': pics, 'origin_text': origin_text,
+                                            'post_id': post_id, 'retweet_count': retweet_count, 'text': text,
+                                            'theme': theme_, 'user': user, 'vec', D_vector})
+
                             text_dict[post_id] = text #D={key: value}, key:在数据库中该微博的序号， value:文本
                             tag_dict[post_id] = hash #D={key: value}, key:在数据库中该微博的序号， value:tags
                         print("post_id =", post_id, "is added.")
@@ -128,9 +132,11 @@ def read_data(tweeter):
             user = data['user']
 
             if tweeter.find(filter={'post_id':post_id}).count() == 0:
-                # TODO: bert
+                D_vector = bert.encoder([text])[0]
                 tweeter.insert({'character_count': character_count, 'collect_count': collect_count,
-                                            'hash': hash, 'pics': pics, 'origin_text': origin_text, 'post_id': post_id, 'retweet_count': retweet_count, 'text': text, 'theme': theme_, 'user': user})
+                                'hash': hash, 'pics': pics, 'origin_text': origin_text,
+                                'post_id': post_id, 'retweet_count': retweet_count, 'text': text,
+                                'theme': theme_, 'user': user, 'vec': D_vector})
                 text_dict[post_id] = text
                 tag_dict[post_id] = hash
                 # print(text_dict)
@@ -152,14 +158,14 @@ def read_data(tweeter):
 if __name__ == "__main__":
     #建立MongoDB数据库连接
     client = MongoClient('localhost',27017)
-    
+
     #连接所需数据库,test为数据库名
     db=client.weibodata
-    
+
     #连接所用集合，也就是我们通常所说的表，test为表名
 
     collection=db.tweeter
-    
+
     # for item in collection.find():
     # print(collection.count())
     read_data(collection)

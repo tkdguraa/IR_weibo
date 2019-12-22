@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 import sys
 sys.path.append('..')
 
@@ -26,10 +27,11 @@ def search(Q_str, algorithm='bert', topN=10, is_qe=False,
     # query expansion & preprocess query
     Q = query_expansion(Q_str, 'title', is_qe)
     print('Q', Q)
+    print(type(Q))
 
     # find tweets that overlaps with keywords of original query
     # TODO
-    post_ids = get_candidates(Q)
+    post_ids = get_candidates(list(Q))
     print("before", post_ids)
     print("ss",get_candidates(["足球"]))
     invi = tweeter.objects.limit(1000)
