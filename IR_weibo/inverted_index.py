@@ -12,17 +12,20 @@ import os
 
 class InvertedIndex:
 
-    def __init__(self, indexPath=args.inverted_index_path):
+    def __init__(self, indexPath=args.inverted_index_path, newIndex = args.new_inverted_index):
         # load stopwords
         self.stopwords = [line.strip() for line in open('../IR_weibo/stopwords.txt', encoding='UTF-8').readlines()]
         self.inverted_index = dict()
         self.indexPath = indexPath
+
         try:
-            if args.new_inverted_index:
-                # print(type(indexPath))
+            if not newIndex:
+                print('Load a old inverted index')
                 if os.path.exists(indexPath):
                     with open(indexPath, 'r') as fin:
                         self.inverted_index = json.load(fin)
+            else:
+                print('Start a new inverted index')
         except Exception as e:
             self.inverted_index = dict()
 
@@ -69,14 +72,17 @@ class InvertedIndex:
 
 class TagIndex:
 
-    def __init__(self, indexPath=args.tag_index_path):
+    def __init__(self, indexPath=args.tag_index_path, newIndex = args.new_tag_index):
         self.tag_index = dict()
         self.indexPath = indexPath
         try:
-            if args.new_tag_index:
+            if not newIndex:
+                print('Load a old tag index')
                 if os.path.exists(indexPath):
                     with open(indexPath, 'r') as fin:
                         self.tag_index = json.load(fin)
+            else:
+                print('Start a new tag index')
         except Exception as e:
             self.tag_index = dict()
 

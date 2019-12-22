@@ -6,6 +6,8 @@ from pymongo import MongoClient
 import time
 import pickle
 import requests
+from IR_weibo.inverted_index import InvertedIndex, TagIndex
+from IR_weibo.crawler_theme import get_parse
 
 #实时爬取数据
 def update_data(tweeter):
@@ -51,9 +53,13 @@ def update_data(tweeter):
             "name": "游戏"
         },
     ]
-    tag_dict = {}
-    text_dict = {}
+    invertedIndex = InvertedIndex(newIndex=False)
+    tagIndex = TagIndex(newIndex=False)
+
     for theme in theme_list:
+        print('Search for %s' %theme['name'])
+        tag_dict = {}
+        text_dict = {}
         try:
             res = requests.get("https://m.weibo.cn/api/container/getIndex?containerid=102803_ctg1_" + str(theme['id']) + "_-_ctg1_" + str(theme['id']) + "&openApp=0")
             for i in range(0, len(res.json()["data"]["cards"])):
@@ -71,25 +77,38 @@ def update_data(tweeter):
                         theme_ = data['theme']
                         pics = data['pics']
                         user = data['user']
-                        tweeter.insert({'character_count': character_count, 'collect_count': collect_count, 
+                        if tweeter.find(filter={'post_id': post_id}).count() == 0:
+                            # TODO: bert
+                            tweeter.insert({'character_count': character_count, 'collect_count': collect_count,
                                             'hash': hash, 'pics': pics, 'origin_text': origin_text, 'post_id': post_id, 'retweet_count': retweet_count, 'text': text, 'theme': theme_, 'user': user})
                         
                         text_dict[post_id] = text #D={key: value}, key:在数据库中该微博的序号， value:文本
                         tag_dict[post_id] = hash #D={key: value}, key:在数据库中该微博的序号， value:tags
-                        print("post_id =", post_id, "is added")
+                        print("post_id =", post_id, "is added.")
                         print(tweeter.count())
                 else:
                     print("post_id =", post_id, "is already exists")
             time.sleep(10)
-            print(theme)
         except:
             print("request error")
             time.sleep(10)
 
-        ##这里开始写更新倒排文档
+        # update index
+        print("Tweeter count: %d" % tweeter.count_documents({}))
+        invertedIndex.update_invert_index(text_dict)
+        tagIndex.update_tag_index(tag_dict)
+        print("Inverted index length: %d" % len(invertedIndex.inverted_index))
+        print("Tag index length: %d" % len(tagIndex.tag_index))
+        # print(invertedIndex.inverted_index)
+        # print(tagIndex.tag_index)
+
+
 
 #直接读取data文件夹里的pickle文件到数据库
 def read_data(tweeter):
+    invertedIndex = InvertedIndex(newIndex=True)
+    tagIndex = TagIndex(newIndex=True)
+
     path =  open('emb_json5.pickle','rb')
     text_dict = {}
     tag_dict = {}
@@ -108,16 +127,25 @@ def read_data(tweeter):
             theme_ = data['theme']
             pics = data['pics']
             user = data['user']
+
             if tweeter.find(filter={'post_id':post_id}).count() == 0:
+                # TODO: bert
                 tweeter.insert({'character_count': character_count, 'collect_count': collect_count,
                                             'hash': hash, 'pics': pics, 'origin_text': origin_text, 'post_id': post_id, 'retweet_count': retweet_count, 'text': text, 'theme': theme_, 'user': user})
-                text_dict[post_id] = text
-                tag_dict[post_id] = hash
+            text_dict[post_id] = text
+            tag_dict[post_id] = hash
                 # print(text_dict)
     except:
         pass
 
-    print(tweeter.find().count())
+    # update index
+    print("Tweeter count: %d" %tweeter.count_documents({}))
+    invertedIndex.update_invert_index(text_dict)
+    tagIndex.update_tag_index(tag_dict)
+    print("Inverted index length: %d" %len(invertedIndex.inverted_index))
+    print("Tag index length: %d" % len(tagIndex.tag_index))
+    # print(invertedIndex.inverted_index)
+    # print(tagIndex.tag_index)
 
     ##这里开始写更新倒排文档
 
