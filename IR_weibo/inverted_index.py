@@ -22,7 +22,7 @@ class InvertedIndex:
             if not newIndex:
                 print('Load a old inverted index')
                 if os.path.exists(indexPath):
-                    with open(indexPath, 'r') as fin:
+                    with open(indexPath, 'r', encoding='UTF-8') as fin:
                         self.inverted_index = json.load(fin)
             else:
                 print('Start a new inverted index')
@@ -31,7 +31,7 @@ class InvertedIndex:
 
 
     def save_index(self):
-        with open(self.indexPath, 'w') as fout:
+        with open(self.indexPath, 'w', encoding="UTF-8") as fout:
             json.dump(self.inverted_index, fout, ensure_ascii=False)
 
 
@@ -79,7 +79,7 @@ class TagIndex:
             if not newIndex:
                 print('Load a old tag index')
                 if os.path.exists(indexPath):
-                    with open(indexPath, 'r') as fin:
+                    with open(indexPath, 'r', encoding='UTF-8') as fin:
                         self.tag_index = json.load(fin)
             else:
                 print('Start a new tag index')
@@ -100,7 +100,7 @@ class TagIndex:
         self.save_index()
 
     def save_index(self):
-        with open(self.indexPath, 'w') as fout:
+        with open(self.indexPath, 'w', encoding='UTF-8') as fout:
             json.dump(self.tag_index, fout, ensure_ascii=False)
 
     def search(self, Q):
