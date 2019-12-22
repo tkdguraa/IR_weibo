@@ -17,7 +17,7 @@ def give_emoji_free_text(text):
 
     return text
 def get_parse(info, theme):
-    print(info)
+    # print(info)
     # print(res.json()['data']['cards'][1])
     # res = requests.get("https://m.weibo.cn/api/container/getIndex?containerid=102803_ctg1_4888_-_ctg1_4888&openApp=0")
     id = info['mblog']['user']['id']
