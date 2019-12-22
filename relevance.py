@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import math
 import jieba
+import time
 from collections import Counter
 from scipy.spatial import distance
 from bert_serving.client import BertClient
@@ -19,10 +20,10 @@ class BERT_embedding(object):
 
     """
     Compute cosine similarity
-    The score ranges from 0 to 2. 2 means most similar
+    The score ranges from -1 to 1. 1 means most similar
     """
     def cosine_similarity(self, D_vectors, Q_vector):
-        return [2 - distance.cosine(d_vector, Q_vector) for d_vector in D_vectors]
+        return [1 - distance.cosine(d_vector, Q_vector) for d_vector in D_vectors]
 
     def score(self, doc_tokens, query_tokens):
         D = [' '.join(tokens) for tokens in doc_tokens]
@@ -31,11 +32,20 @@ class BERT_embedding(object):
         Q_vector = self.encoder(Q)
         return self.cosine_similarity(D_vectors, Q_vector)
 
-def BERT_score(doc_tokens, query_tokens):
-    bert = BERT_embedding()
-    scores = bert.score(doc_tokens, query_tokens)
-    return scores
+    def score_only_encode_Q(self, D_vectors, query_tokens):
+        Q = [' '.join(query_tokens)]
+        Q_vector = self.encoder(Q)
+        return self.cosine_similarity(D_vectors, Q_vector)
 
+#def BERT_score(doc_tokens, query_tokens):
+#    bert = BERT_embedding()
+#    scores = bert.score(doc_tokens, query_tokens)
+#    return scores
+
+def BERT_score(D_vectors, query_tokens):
+    bert = BERT_embedding()
+    scores = bert.score_only_encode_Q(D_vectors, query_tokens)
+    return scores
 
 class BM25(object):
     def __init__(self, docs):
@@ -151,7 +161,11 @@ def  similarity_score(D, Q, algorithm):
     else:
         func = recall
 
-    return func(D, Q)
+    t1 = time.time()
+    scores = func(D, Q)
+    t2 = time.time()
+    print('Computing similarity score costs ', t2-t1, 'secs')
+    return scores
 
 
 if __name__ == "__main__":

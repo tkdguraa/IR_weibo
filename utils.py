@@ -51,7 +51,7 @@ flatten = lambda l: [item for sublist in l for item in sublist]
 
 # Query Expansion
 # info_type also can be 'snippet'
-def query_expansion(Q_str, info_type='title', flag=True, max_q_len=20):
+def query_expansion(Q_str, info_type='title', flag=True, max_q_len=25):
     if flag is False: return set(preprocess([Q_str])[0])
 
     Q = set(preprocess([Q_str])[0])
@@ -77,7 +77,13 @@ def query_expansion(Q_str, info_type='title', flag=True, max_q_len=20):
     return newQ
 
 def get_topN_idxs(scores, topN):
-    return np.array(scores).argsort()[-topN:][::-1]
+    # O(n)
+    unordered_topN_idxs = np.argpartition(scores, -topN)[-topN:]
+    # O(klogk), k=topN
+    ordered_topN_idxs = unordered_topN_idxs[np.argsort(scores[unordered_topN_idxs])][::-1]
+    return ordered_topN_idxs
+#    return np.array(scores).argsort()[-topN:][::-1]
+
 
 # Compute overall score including popularity
 alpha = 0.1
