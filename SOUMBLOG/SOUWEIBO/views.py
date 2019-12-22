@@ -100,7 +100,7 @@ def load_tweets_from_db(post_id):
     return data_list
 
 
-def click_search(request, words, page, type):
+def click_search(request, words, type):
     # print(request.POST.get('words'))
     if type == 'tag':
         print("search TAG")
@@ -110,33 +110,26 @@ def click_search(request, words, page, type):
 
     else:
         print("search NORMAL")
-        invi = search(words, algorithm='bert', topN=10, is_qe=False)
+        invi = search(words, algorithm='bert', topN=50, is_qe=False)
         Q = query_expansion(words, jieba.lcut_for_search, 'title', False) #获取搜索输入的分词集
         Q = list(Q)
-        # print("before sort", Q)
         Q.sort(key = lambda i:len(i),reverse=True)
-        # print("after sort", Q)
         print("Search results: %d data" % len(invi))
 
     data_list = []
-    if len(invi) <= 5:
-        for x in invi:
-            data = x
-            data['search'] = words
-            data['divided'] = Q
-            data['type'] = type
-            data_list.append(data)
-    else:
-        for i in range((page - 1) * 5, (page - 1) * 5 + 5):
-            # post_id = invi[i + (page - 1) * 5]
-            # x = tweeter.objects.filter(post_id = post_id)[0]
-            data = invi[i]
-            data['search'] = words
-            data['divided'] = Q
-            data['type'] = type
-            data_list.append(data)
+    for x in invi:
+        data = x
+        data['search'] = words
+        data['divided'] = Q
+        data['type'] = type
+        data_list.append(data)
 
-    return render(request, 'SOUWEIBO/search_interface.html', {'datas': json.dumps(data_list), 'number': len(invi)})
+    info = dict()
+    info['search'] = words
+    info['divided'] = Q
+    info['type'] = type
+
+    return render(request, 'SOUWEIBO/search_interface.html', {'datas': json.dumps(data_list), 'number': len(invi), 'info': info})
 
 
 def page_not_found(request,exception):

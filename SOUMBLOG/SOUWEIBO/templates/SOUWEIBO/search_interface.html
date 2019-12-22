@@ -31,58 +31,96 @@
     {% comment %} <script src="{% static 'js/extention/choices.js' %}"></script> {% endcomment %}
     <script src='//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js' type='text/javascript'></script>
     <script>
-        var data_list = {{datas|safe}}
-        var i = 0
-        $(document).ready(function(){
-            var cnt = 0
-            var get_len = 0
-            for(i = 0; i < window.location.pathname.length; i++){
-              if(cnt == 4)
-                get_len = i
-              if(window.location.pathname[i] == '/')
-                  cnt = cnt + 1
+        function display(data_list, cur){
+          var search_info = {{info|safe}}
+          path = window.location.pathname
+          console.log(path)
+          for(i = 9; i < path.length; i++){
+            if(path[i] == '/'){
+              console.log('path', path.substr(8, (i - 8)))
+              break;
             }
-            var current = window.location.pathname.substr(get_len); 
-            console.log(current)
+          }
+          $('.result').remove()
+          $("#search_box").append("<div class=result></div>")
+          console.log(data_list[0]['words'])
+          var tweeter_total_num = {{number|safe}}
+          idx_len = 5
+          if(data_list.length < 5)
+            idx_len = data_list.length
+          for(i = 0; i < idx_len; i++){
+            idx = i + 5 * (cur - 1)
+            console.log("IIINDEX", idx)
+            var post_id = data_list[idx]["post_id"]
+            var text = data_list[idx]['origin_text']
+            var pics = data_list[idx]['pics']
+            var image = data_list[idx]['user']['image']
+            var screen_name = data_list[idx]['user']['screen_name']
+            var retweet_count = data_list[idx]['retweet_count']
+            var like = data_list[idx]['like']
+            var divided = data_list[idx]['divided']
+            console.log(data_list[0]['search'])
+
+            $('#search').val(search_info['search'])
+
+            
+
+            for(j = 0; j < divided.length; j++){
+              one = divided[j]
+              text = text.replace(new RegExp(one,"gm"), "<font color='red'>" + one + "</font>")
+            }
+            $("div.result").append("<br></br>")
+            $("div.result").append("<div class=tweeter " + "id=tw" + i + ">" + "<div class=profile><img src=" + image + " class = image><div class=name>" + screen_name + "</div></div>" + "</div>")
+            $("#tw" + i).append("<br>")
+            $("#tw" + i).append("<div class=text>" + text + "</div>")
+            $("#tw" + i).append("<br>")
+            $("#tw" + i).append("<div class=pics id = " + i + "></div>")
+            $("#tw" + i).append("<br>")
+            $("#tw" + i).append("<div class=info><a href= https://m.weibo.cn/detail/" + data_list[i]['post_id'] + ">跳转&nbsp;&nbsp;&nbsp;&nbsp;</a> 转发" + retweet_count + " &nbsp;&nbsp;&nbsp;&nbsp;点赞 " + like + "</div>")
+
+            for(j = 0; j < pics.length; j++){
+              $("#" + i).append("<img src=" + pics[j] + " class = pictures>")
+            }
+          }
+          $("div.result").append("<br></br>")
+          $("div.result").append("<div class=page></div>")
+          now_page = parseInt((cur - 1)/5)
+          page_num = parseInt(tweeter_total_num / 5);
+          console.log(now_page, page_num)
+          page_list = parseInt(page_num / 5);
+          if(now_page > 0)      
+            $('.page').append("<a href='javascript:void(0);' id=prev>上一页&nbsp&nbsp&nbsp</a>");
+
+          cnt_limit = 0
+          for(var i = (now_page * 5) + 1; i <= page_num; i++){
+            $('.page').append("<a class='pagenum' href='javascript:void(0);' id=P" + i + ">" + i + "&nbsp&nbsp&nbsp</a>");
+            if(cnt_limit == 4){
+              break;
+            }
+            cnt_limit++;
+          }
+          $('#P' + cur).css('color','black');
+          if(parseInt(page_list) > now_page + 1){
+            console.log("YEYEYA")
+            $('.page').append("<a id=next href='javascript:void(0);'>下一页</a>");
+          }
+        }
+        var data_list = {{datas|safe}}
+        var tweeter_total_num = {{number|safe}}
+        var i = 0
+        var current = 1
+        $(document).ready(function(){
             if(data_list.length != 0){
-              //$("#search_box")[0].style.marginTop = "-20%"
-              var tweeter_total_num = {{number|safe}}
-              var words = data_list[0]['search']
-              var search_type = data_list[0]['type']
-              var input
-              $("#search_box").append("<div class=result></div>")
-              for(i = 0; i < 5; i++){
-                var post_id = data_list[i]['post_id']
-                var text = data_list[i]['origin_text']
-                var pics = data_list[i]['pics']
-                var image = data_list[i]['user']['image']
-                var screen_name = data_list[i]['user']['screen_name']
-                var retweet_count = data_list[i]['retweet_count']
-                var like = data_list[i]['like']
-                var divided = data_list[i]['divided']
-                console.log(divided)
-                for(j = 0; j < divided.length; j++){
-                  one = divided[j]
-                  text = text.replace(new RegExp(one,"gm"), "<font color='red'>" + one + "</font>")
-                }
-
-
-                $("div.result").append("<br></br>")
-                $("div.result").append("<div class=tweeter " + "id=tw" + i + ">" + "<div class=profile><img src=" + image + " class = image><div class=name>" + screen_name + "</div></div>" + "</div>")
-                $("#tw" + i).append("<br>")
-                $("#tw" + i).append("<div class=text>" + text + "</div>")
-                $("#tw" + i).append("<br>")
-                $("#tw" + i).append("<div class=pics id = " + i + "></div>")
-                $("#tw" + i).append("<br>")
-                $("#tw" + i).append("<div class=info><a href= https://m.weibo.cn/detail/" + data_list[i]['post_id'] + ">跳转&nbsp;&nbsp;&nbsp;&nbsp;</a> 转发" + retweet_count + " &nbsp;&nbsp;&nbsp;&nbsp;点赞 " + like + "</div>")
-
-
-                for(j = 0; j < pics.length; j++){
-                  $("#" + i).append("<img src=" + pics[j] + " class = pictures>")
-                }
-              }
-              $("div.result").append("<br></br>")
-              $("div.result").append("<div class=page></div>")
+              display(data_list,current)
+            }
+            else{
+                if (window.location.pathname.length > 1)
+                  var search_info = {{info|safe}}
+                  if(search_info['type'] == 'tag')
+                    $('#search').val('#' + search_info['search'] + '#')
+                  else
+                    $('#search').val(search_info['search'])
+                  $("#search_box").append("<div class=blank_result>没有搜索结果</div>")
             }
             $("#go").click(function(){
               if($("#search").val() == "")
@@ -98,40 +136,31 @@
                   search_type = 'normal'
                   input = $("#search").val()
                 }
-                window.location.href="/search/" + input + "/" + search_type + "/1" 
+                window.location.href="/search/" + input + "/" + search_type
             });
-            cnt_limit = 0
-            console.log(current)
-            now_page = parseInt(current/5)
-            page_num = parseInt(tweeter_total_num / 5) + 1;
-            console.log(now_page, page_num)
-            page_list = parseInt(page_num / 5);
-            if(now_page > 0)      
-              $('.page').append("<a href=/search/" + words + "/" + search_type + '/' + ((now_page - 1) * 5 + 1) + " id=prev>上一页&nbsp&nbsp&nbsp</a>");
 
-            for(var i = (now_page * 5); i <= page_num; i++){
-              $('div.page').append("<a class='pagenum' href='javascript:void(0);' id=P" + ( i + 1 ) + ">" + (i + 1) + "&nbsp&nbsp&nbsp</a>");
-              if(cnt_limit == 4){
-                break;
-              }
-              cnt_limit++;
-            }
             $('#P' + current).css('color','black');
-            if(parseInt(page_list) > now_page)
-              $('div.page').append("<a href=/search/" + words + "/" + search_type + '/' + ((now_page + 1) * 5 + 1) + " id=next>下一页</a>");
-
-            
             $(document).on('click','#prev',function(){
-              now_page--;
               cnt_limit = 0;
-              $('.page').empty();
+              console.log("test", current)
+              display(data_list, (parseInt(current / 5) - 1) * 5 + 1)
+              current = (parseInt(current / 5) - 1) * 5 + 1
+            });
+            $(document).on('click','#next',function(){
+              cnt_limit = 0;
+              console.log("test", current)
+              display(data_list, (parseInt(current / 5) + 1) * 5 + 1)
+              current = (parseInt(current / 5) + 1) * 5 + 1
+              console.log("currrrentttt", current)
             });
             $(document).on('click','.pagenum',function(){
               $('.pagenum').each(function(){
                 $(this).css('color','');
               });
               $(this).css('color','black');
-              window.location = '/search/' + words + '/' + search_type + '/' + this.id.substr(1);
+              current = this.id.substr(1)
+              var data_list = {{datas|safe}}
+              display(data_list, current)
             });
         });
     </script>
@@ -139,6 +168,14 @@
         div.result{
           background: #d5d9db;
           width: 100%;
+          text-align: center;
+          color: black;
+          border-radius: 20px;
+        }
+        div.blank_result{
+          background: #d5d9db;
+          width: 100%;
+          height: 500px;
           text-align: center;
           color: black;
           border-radius: 20px;
