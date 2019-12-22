@@ -10,50 +10,52 @@ from IR_weibo.relevance import BERT_embedding
 from IR_weibo.inverted_index import InvertedIndex, TagIndex
 from IR_weibo.crawler_theme import get_parse
 
+theme_list = [
+    {
+        "id": 4288,
+        "name": "明星"
+    },
+    {
+        "id": 4388,
+        "name": "搞笑"
+    },
+    {
+        "id": 1988,
+        "name": "情感"
+    },
+    {
+        "id": 4288,
+        "name": "明星"
+    },
+    {
+        "id": 4188,
+        "name": "社会"
+    },
+    {
+        "id": 5088,
+        "name": "数码"
+    },
+    {
+        "id": 1388,
+        "name": "体育"
+    },
+    {
+        "id": 5188,
+        "name": "汽车"
+    },
+    {
+        "id": 3288,
+        "name": "电影"
+    },
+    {
+        "id": 4888,
+        "name": "游戏"
+    },
+]
+
 #实时爬取数据
 def update_data(tweeter):
-    theme_list = [
-        {
-            "id": 4288,
-            "name": "明星"
-        },
-        {
-            "id": 4388,
-            "name": "搞笑"
-        },
-        {
-            "id": 1988,
-            "name": "情感"
-        },
-        {
-            "id": 4288,
-            "name": "明星"
-        },
-        {
-            "id": 4188,
-            "name": "社会"
-        },
-        {
-            "id": 5088,
-            "name": "数码"
-        },
-        {
-            "id": 1388,
-            "name": "体育"
-        },
-        {
-            "id": 5188,
-            "name": "汽车"
-        },
-        {
-            "id": 3288,
-            "name": "电影"
-        },
-        {
-            "id": 4888,
-            "name": "游戏"
-        },
-    ]
+
     invertedIndex = InvertedIndex(newIndex=False)
     tagIndex = TagIndex(newIndex=False)
     bert = BERT_embedding()
@@ -81,17 +83,17 @@ def update_data(tweeter):
                         user = data['user']
                         if tweeter.find(filter={'post_id': post_id}).count() == 0:
                             D_vector = bert.encoder([text])[0].tolist()
-                            tweeter.insert({'character_count': character_count, 'collect_count': collect_count,
+                            tweeter.insert_one({'character_count': character_count, 'collect_count': collect_count,
                                             'hash': hash, 'pics': pics, 'origin_text': origin_text,
                                             'post_id': post_id, 'retweet_count': retweet_count, 'text': text,
                                             'theme': theme_, 'user': user, 'vec': D_vector})
 
                             text_dict[post_id] = text #D={key: value}, key:在数据库中该微博的序号， value:文本
                             tag_dict[post_id] = hash #D={key: value}, key:在数据库中该微博的序号， value:tags
-                        print("post_id =", post_id, "is added.")
+                        print("Post_id =", post_id, "is added.")
                         print(tweeter.count())
                 else:
-                    print("post_id =", post_id, "is already exists")
+                    print("Post_id =", post_id, "already exists")
             time.sleep(10)
         except:
             print("request error")
@@ -116,8 +118,7 @@ def read_data(tweeter):
     path =  open('tweets_with_embeddings.pickle','rb')
     text_dict = {}
     tag_dict = {}
-    print("hello")
-    print("start")
+
     try:
         while True:
             data = pickle.load(path)
@@ -132,8 +133,8 @@ def read_data(tweeter):
             pics = data['pics']
             user = data['user']
             D_vector = data['vec'].tolist()
-            if tweeter.find(filter={'post_id':post_id}).count() == 0:
-                tweeter.insert({'character_count': character_count, 'collect_count': collect_count,
+            if tweeter.count_documents(filter={'post_id':post_id}) == 0:
+                tweeter.insert_one({'character_count': character_count, 'collect_count': collect_count,
                                 'hash': hash, 'pics': pics, 'origin_text': origin_text,
                                 'post_id': post_id, 'retweet_count': retweet_count, 'text': text,
                                 'theme': theme_, 'user': user, 'vec': D_vector})
@@ -152,8 +153,6 @@ def read_data(tweeter):
     # print(invertedIndex.inverted_index)
     # print(tagIndex.tag_index)
 
-    ##这里开始写更新倒排文档
-
 
 if __name__ == "__main__":
     #建立MongoDB数据库连接
@@ -168,7 +167,8 @@ if __name__ == "__main__":
 
     # for item in collection.find():
     # print(collection.count())
-    # read_data(collection)
+    read_data(collection)
+
     while 1:
         update_data(collection)
         time.sleep(300)

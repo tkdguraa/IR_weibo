@@ -121,6 +121,9 @@ venv.bak/
 # vscode
 .vscode/*
 
-
 .DS_Store
+
+IR_weibo/*.pickle
+
+
 

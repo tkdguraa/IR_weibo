@@ -39,6 +39,12 @@ def get_candidates(Q):
     # return len(invertedIndex.inverted_index)
     return invertedIndex.search(Q)
 
+
+def get_candidates_tag(Q):
+    tagIndex = TagIndex()
+    # return len(invertedIndex.inverted_index)
+    return tagIndex.search(Q)
+
 def extract_info(tweets, attr):
     try:
         return [tweet[attr] for tweet in tweets]
