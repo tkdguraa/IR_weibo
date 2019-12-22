@@ -99,7 +99,11 @@ def click_search(request, words, page):
     # print(request.POST.get('words'))
 
     invi = search(words, algorithm='bm25', topN=10, is_qe=False)
-
+    Q = query_expansion(words, 'title', False) #获取搜索输入的分词集
+    Q = list(Q)
+    print("before sort", Q)
+    Q.sort(key = lambda i:len(i),reverse=True)  
+    print("after sort", Q)
     print(len(invi))
     data_list = []
     if len(invi) <= 5:
@@ -117,6 +121,7 @@ def click_search(request, words, page):
                 "pics": x['pics'],
                 "user": x['user'],
                 "search": words,
+                "divided": Q,
             }
             data_list.append(data)
     else:
@@ -135,11 +140,14 @@ def click_search(request, words, page):
                 "pics": x['pics'],
                 "user": x['user'],
                 "search": words,
+                "divided": Q,
             }
             data_list.append(data)
 
     return render(request, 'SOUWEIBO/search_interface.html', {'datas': json.dumps(data_list), 'number': len(invi)})
 
+def page_not_found(request,exception):
+    return render(request, 'SOUWEIBO/page404.html')
 
 if __name__ == "__main__":
     update_data('qwq')

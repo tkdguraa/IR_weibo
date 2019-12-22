@@ -46,7 +46,15 @@
         var like = 605
 
         $(document).ready(function(){
-            var current = window.location.pathname.substr(27); 
+            var cnt = 0
+            var get_len = 0
+            for(i = 0; i < window.location.pathname.length; i++){
+              if(cnt == 3)
+                get_len = i
+              if(window.location.pathname[i] == '/')
+                  cnt = cnt + 1
+            }
+            var current = window.location.pathname.substr(get_len); 
             console.log(current)
             if(data_list.length != 0){
               //$("#search_box")[0].style.marginTop = "-20%"
@@ -61,6 +69,14 @@
                 var screen_name = data_list[i]['user']['screen_name']
                 var retweet_count = data_list[i]['retweet_count']
                 var like = data_list[i]['like']
+                var divided = data_list[i]['divided']
+                console.log(divided)
+                for(j = 0; j < divided.length; j++){
+                  one = divided[j]
+                  text = text.replace(new RegExp(one,"gm"), "<font color='red'>" + one + "</font>")
+                }
+
+
                 $("div.result").append("<br></br>")
                 $("div.result").append("<div class=tweeter " + "id=tw" + i + ">" + "<div class=profile><img src=" + image + " class = image><div class=name>" + screen_name + "</div></div>" + "</div>")
                 $("#tw" + i).append("<br>")
@@ -68,7 +84,8 @@
                 $("#tw" + i).append("<br>")
                 $("#tw" + i).append("<div class=pics id = " + i + "></div>")
                 $("#tw" + i).append("<br>")
-                $("#tw" + i).append("<div class=info> 转发" + retweet_count + " &nbsp;&nbsp;&nbsp;&nbsp;点赞 " + like + "</div>")
+                $("#tw" + i).append("<div class=info><a href= https://m.weibo.cn/detail/" + data_list[i]['post_id'] + ">跳转&nbsp;&nbsp;&nbsp;&nbsp;</a> 转发" + retweet_count + " &nbsp;&nbsp;&nbsp;&nbsp;点赞 " + like + "</div>")
+
 
                 for(j = 0; j < pics.length; j++){
                   $("#" + i).append("<img src=" + pics[j] + " class = pictures>")
@@ -77,18 +94,21 @@
               $("div.result").append("<br></br>")
               $("div.result").append("<div class=page></div>")
             }
-            $("div.tweeter").click(function(){
-              window.location.href="https://m.weibo.cn/detail/" + data_list[this.id.substr(2)]['post_id']
-            });
             $("#go").click(function(){
-              window.location.href="/search/" + $("#search").val() + "/1" 
+              if($("#search").val() == "")
+                alert("输入不能为空!")
+              else
+                window.location.href="/search/" + $("#search").val() + "/1" 
             });
             cnt_limit = 0
-            now_page = 0
-            page_num = parseInt(tweeter_total_num / 15);
+            console.log(current)
+            now_page = parseInt(current/5)
+            page_num = parseInt(tweeter_total_num / 5) + 1;
+            console.log(now_page, page_num)
             page_list = parseInt(page_num / 5);
             if(now_page > 0)      
-              $('.page').append("<a href='javascript:void(0);' id='prev'>上一页&nbsp&nbsp&nbsp</a>");
+              $('.page').append("<a href=/search/" + search + '/' + ((now_page - 1) * 5 + 1) + " id=prev>上一页&nbsp&nbsp&nbsp</a>");
+
             for(var i = (now_page * 5); i <= page_num; i++){
               $('div.page').append("<a class='pagenum' href='javascript:void(0);' id=P" + ( i + 1 ) + ">" + (i + 1) + "&nbsp&nbsp&nbsp</a>");
               if(cnt_limit == 4){
@@ -98,13 +118,13 @@
             }
             $('#P' + current).css('color','black');
             if(parseInt(page_list) > now_page)
-              $('div.page').append("<a href='javascript:void(0);' id=next>下一页</a>");
+              $('div.page').append("<a href=/search/" + search + '/' + ((now_page + 1) * 5 + 1) + " id=next>下一页</a>");
+
             
             $(document).on('click','#prev',function(){
               now_page--;
               cnt_limit = 0;
               $('.page').empty();
-              window.location = '/msglist/page/' + (current - 1);
             });
             $(document).on('click','.pagenum',function(){
               $('.pagenum').each(function(){
