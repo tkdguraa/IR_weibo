@@ -8,6 +8,7 @@ import os
 from django.shortcuts import render
 from django.http.response import HttpResponse
 import json
+import jieba
 os.environ['DJANGO_SETTINGS_MODULE'] = 'SOUMBLOG.settings'
 from IR_weibo.relevance import similarity_score
 from IR_weibo.utils import preprocess, get_candidates, extract_info, query_expansion, overall_score, get_topN_idxs
@@ -24,21 +25,14 @@ return [post_id]
 """
 def search(Q_str, algorithm='bert', topN=10, is_qe=False,
            additional_attrs=['retweet_count', 'followers_count']):
-    # query expansion & preprocess query
-    Q = query_expansion(Q_str, 'title', is_qe)
+    # Query expansion & preprocess query
+    Q = query_expansion(Q_str, jieba.lcut_for_search, 'title', is_qe)
     print('Q', Q)
-    print(type(Q))
 
-    # find tweets that overlaps with keywords of original query
-    # TODO
+    # Find tweets that overlaps with keywords of original query
     post_ids = get_candidates(list(Q))
     print("before", post_ids)
-    print("ss",get_candidates(["足球"]))
-    invi = tweeter.objects.limit(1000)
-    post_ids = []
-    for i in range(0,1000):
-        obj = invi[i]
-        post_ids.append(obj['post_id'])
+
     # print(type(post_ids[0]))
     # num = tweeter.objects.filter(post_id=str(post_ids[0]))
     # print("www", len(num))
@@ -46,27 +40,32 @@ def search(Q_str, algorithm='bert', topN=10, is_qe=False,
 
     tweets = load_tweets_from_db(post_ids)
     print("len(tweets)", len(tweets))
-    # extract text
-    texts = extract_info(tweets, 'text')
+    
+    # Preprocess documents
+    if algorithm == 'bert':
+        # Extract precalculated embeddings
+        D = extract_info(tweets, 'vec')
+    else:
+        # Extract and preprocess texts
+        texts = extract_info(tweets, 'text')
+        D = preprocess(texts, jieba.lcut_for_search)
 
-    # preprocess texts
-    D = preprocess(texts)
-
-    # number of candidate documents is smaller than output documents number
-    print("len(D)", len(D))
-    if len(D) <= topN:
-        topN = len(D)
-
-    # estimate the degree of similarity between query and documents
+    # Estimate the degree of similarity between query and documents
     scores = similarity_score(D, Q, algorithm)
 
-    # compute overall scores including popularity
+    # Compute overall scores including popularity
     # overall_scores = overall_score(scores, tweets, ['retweet_count', 'followers_count'])
-    overall_scores = scores #temp
-    # sort
+    overall_scores = scores #FIXME
+
+    # Number of candidate documents is smaller than output documents number
+    print("len(scores)", len(overall_scores))
+    if len(overall_scores) <= topN:
+        topN = len(overall_scores)
+
+    # Sort
     topN_idxs = get_topN_idxs(overall_scores, topN)
-    results = [post_ids[idx] for idx in topN_idxs]
-    return results
+    result_post_ids = [post_ids[idx] for idx in topN_idxs]
+    return result_post_ids
 
 # Create your views here.
 def search_interface(request):
@@ -99,9 +98,10 @@ def load_tweets_from_db(post_id):
 
 def click_search(request, words, page):
     # print(request.POST.get('words'))
-
-    invi = search(words, algorithm='bm25', topN=10, is_qe=False)
-    Q = query_expansion(words, 'title', False) #获取搜索输入的分词集
+    if words[0] == '#' and words[-1] == '#':
+        print(words.strip('#'))
+    invi = search(words, algorithm='bert', topN=10, is_qe=False)
+    Q = query_expansion(words, jieba.lcut_for_search, 'title', False) #获取搜索输入的分词集
     Q = list(Q)
     print("before sort", Q)
     Q.sort(key = lambda i:len(i),reverse=True)  

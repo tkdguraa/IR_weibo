@@ -80,11 +80,11 @@ def update_data(tweeter):
                         pics = data['pics']
                         user = data['user']
                         if tweeter.find(filter={'post_id': post_id}).count() == 0:
-                            D_vector = bert.encoder([text])[0]
+                            D_vector = bert.encoder([text])[0].tolist()
                             tweeter.insert({'character_count': character_count, 'collect_count': collect_count,
                                             'hash': hash, 'pics': pics, 'origin_text': origin_text,
                                             'post_id': post_id, 'retweet_count': retweet_count, 'text': text,
-                                            'theme': theme_, 'user': user, 'vec', D_vector})
+                                            'theme': theme_, 'user': user, 'vec': D_vector})
 
                             text_dict[post_id] = text #D={key: value}, key:在数据库中该微博的序号， value:文本
                             tag_dict[post_id] = hash #D={key: value}, key:在数据库中该微博的序号， value:tags
@@ -113,9 +113,10 @@ def read_data(tweeter):
     invertedIndex = InvertedIndex(newIndex=True)
     tagIndex = TagIndex(newIndex=True)
 
-    path =  open('emb_json5.pickle','rb')
+    path =  open('tweets_with_embeddings.pickle','rb')
     text_dict = {}
     tag_dict = {}
+    print("hello")
     print("start")
     try:
         while True:
@@ -130,9 +131,8 @@ def read_data(tweeter):
             theme_ = data['theme']
             pics = data['pics']
             user = data['user']
-
+            D_vector = data['vec'].tolist()
             if tweeter.find(filter={'post_id':post_id}).count() == 0:
-                D_vector = bert.encoder([text])[0]
                 tweeter.insert({'character_count': character_count, 'collect_count': collect_count,
                                 'hash': hash, 'pics': pics, 'origin_text': origin_text,
                                 'post_id': post_id, 'retweet_count': retweet_count, 'text': text,
@@ -168,7 +168,7 @@ if __name__ == "__main__":
 
     # for item in collection.find():
     # print(collection.count())
-    read_data(collection)
-    # while 1:
-    #     update_data(collection)
-    #     time.sleep(300)
+    # read_data(collection)
+    while 1:
+        update_data(collection)
+        time.sleep(300)

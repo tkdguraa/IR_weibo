@@ -5,7 +5,7 @@ sys.path.append('..')
 
 import random
 import requests
-import jieba, json
+import json
 from math import log10
 import numpy as np
 from requests.adapters import HTTPAdapter
@@ -23,11 +23,11 @@ with open('../IR_weibo/config.json', 'r') as f:
 stopwords = [line.strip() for line in open('../IR_weibo/stopwords.txt', encoding='UTF-8').readlines()]
 
 # Preprocessing
-def preprocess(texts):
+def preprocess(texts, lcut_func):
     D = []
     for text in texts:
         # remove stopwords
-        tokens = [token.strip() for token in (jieba.lcut_for_search(text)) if token not in stopwords and len(token.strip()) is not 0]
+        tokens = [token.strip() for token in (lcut_func(text)) if token not in stopwords and len(token.strip()) is not 0]
         if tokens == []: tokens = ['。'] # tokens cannot be empty
         D.append(tokens)
     return D
@@ -59,10 +59,10 @@ flatten = lambda l: [item for sublist in l for item in sublist]
 
 # Query Expansion
 # info_type also can be 'snippet'
-def query_expansion(Q_str, info_type='title', flag=True, max_q_len=25):
-    if flag is False: return set(preprocess([Q_str])[0])
+def query_expansion(Q_str, lcut_func, info_type='title', flag=True, max_q_len=25):
+    if flag is False: return set(preprocess([Q_str], lcut_func)[0])
 
-    Q = set(preprocess([Q_str])[0])
+    Q = set(preprocess([Q_str], lcut_func)[0])
     if len(Q) >= max_q_len: return Q
 
     url = 'https://www.googleapis.com/customsearch/v1?key=' + config['GoogleAPIKey'] \
@@ -81,7 +81,7 @@ def query_expansion(Q_str, info_type='title', flag=True, max_q_len=25):
     r = json.loads(response.text)
     items = r['items']
     expanded = [item[info_type] for item in items]
-    expanded_Q = set(flatten(preprocess(expanded)))
+    expanded_Q = set(flatten(preprocess(expanded, lcut_func)))
 
     len_to_expand = max_q_len - len(Q)
     if len(expanded_Q) > len_to_expand:
@@ -92,9 +92,12 @@ def query_expansion(Q_str, info_type='title', flag=True, max_q_len=25):
     return newQ
 
 def get_topN_idxs(scores, topN):
+    scores = np.array(scores)
     # O(n)
     unordered_topN_idxs = np.argpartition(scores, -topN)[-topN:]
     # O(klogk), k=topN
+    print("unorder", unordered_topN_idxs)
+    print("score_len", len(scores))
     ordered_topN_idxs = unordered_topN_idxs[np.argsort(scores[unordered_topN_idxs])][::-1]
     return ordered_topN_idxs
 
@@ -168,4 +171,4 @@ class DESAdapter(HTTPAdapter):
 
 
 if __name__ == "__main__":
-    print(get_candidates(["足球"]))
+    print(get_candidates(["足睃"]))
