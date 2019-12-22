@@ -82,8 +82,8 @@ def update_data(tweeter):
                             tweeter.insert({'character_count': character_count, 'collect_count': collect_count,
                                             'hash': hash, 'pics': pics, 'origin_text': origin_text, 'post_id': post_id, 'retweet_count': retweet_count, 'text': text, 'theme': theme_, 'user': user})
                         
-                        text_dict[post_id] = text #D={key: value}, key:在数据库中该微博的序号， value:文本
-                        tag_dict[post_id] = hash #D={key: value}, key:在数据库中该微博的序号， value:tags
+                            text_dict[post_id] = text #D={key: value}, key:在数据库中该微博的序号， value:文本
+                            tag_dict[post_id] = hash #D={key: value}, key:在数据库中该微博的序号， value:tags
                         print("post_id =", post_id, "is added.")
                         print(tweeter.count())
                 else:
@@ -116,7 +116,6 @@ def read_data(tweeter):
     try:
         while True:
             data = pickle.load(path)
-            print(data['post_id'])
             character_count = data['character_count']
             collect_count = str(data['collect_count'])
             hash = data['hash']
@@ -132,8 +131,8 @@ def read_data(tweeter):
                 # TODO: bert
                 tweeter.insert({'character_count': character_count, 'collect_count': collect_count,
                                             'hash': hash, 'pics': pics, 'origin_text': origin_text, 'post_id': post_id, 'retweet_count': retweet_count, 'text': text, 'theme': theme_, 'user': user})
-            text_dict[post_id] = text
-            tag_dict[post_id] = hash
+                text_dict[post_id] = text
+                tag_dict[post_id] = hash
                 # print(text_dict)
     except:
         pass

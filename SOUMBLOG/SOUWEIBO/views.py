@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 import sys
 sys.path.append('..')
 
@@ -24,17 +25,18 @@ return [post_id]
 def search(Q_str, algorithm='bert', topN=10, is_qe=False,
            additional_attrs=['retweet_count', 'followers_count']):
     # query expansion & preprocess query
-    Q_str = '电视剧电影'
     Q = query_expansion(Q_str, 'title', is_qe)
     print('Q', Q)
+    print(type(Q))
 
     # find tweets that overlaps with keywords of original query
     # TODO
-    # post_ids = get_candidates(Q)
-
-    invi = tweeter.objects.filter(theme='游戏')
+    post_ids = get_candidates(list(Q))
+    print("before", post_ids)
+    print("ss",get_candidates(["足球"]))
+    invi = tweeter.objects.limit(1000)
     post_ids = []
-    for i in range(0,10):
+    for i in range(0,1000):
         obj = invi[i]
         post_ids.append(obj['post_id'])
     # print(type(post_ids[0]))
@@ -43,7 +45,7 @@ def search(Q_str, algorithm='bert', topN=10, is_qe=False,
     # print("posts", post_ids)
 
     tweets = load_tweets_from_db(post_ids)
-
+    print("len(tweets)", len(tweets))
     # extract text
     texts = extract_info(tweets, 'text')
 
@@ -51,15 +53,16 @@ def search(Q_str, algorithm='bert', topN=10, is_qe=False,
     D = preprocess(texts)
 
     # number of candidate documents is smaller than output documents number
+    print("len(D)", len(D))
     if len(D) <= topN:
-        return  post_ids
+        topN = len(D)
 
     # estimate the degree of similarity between query and documents
     scores = similarity_score(D, Q, algorithm)
 
     # compute overall scores including popularity
-    overall_scores = overall_score(scores, tweets, ['retweet_count', 'followers_count'])
-
+    # overall_scores = overall_score(scores, tweets, ['retweet_count', 'followers_count'])
+    overall_scores = scores #temp
     # sort
     topN_idxs = get_topN_idxs(overall_scores, topN)
     results = [post_ids[idx] for idx in topN_idxs]
@@ -77,11 +80,8 @@ def update_data(request):
 def load_tweets_from_db(post_id):
     data_list = []
     for id in post_id:
-        print("hello", id)
-        invi = tweeter.objects.filter(post_id = id)
-        print("here",invi)
-        try:
-            data = {
+        invi = tweeter.objects.filter(post_id = id)[0]
+        data = {
                 "character_count": invi['character_count'],
                 "like": invi['collect_count'],
                 "hash": invi['hash'],
@@ -92,16 +92,15 @@ def load_tweets_from_db(post_id):
                 "theme": invi['theme'],
                 "pics": invi['pics'],
                 "user": invi['user'],
+                "vec": invi['vec'],
             }
-            data_list.append(data)
-        except:
-            continue
+        data_list.append(data)
     return data_list
 
 def click_search(request, words, page):
     # print(request.POST.get('words'))
 
-    invi = search(words, algorithm='bm25', topN=100, is_qe=False)
+    invi = search(words, algorithm='bm25', topN=10, is_qe=False)
 
     print(len(invi))
     data_list = []

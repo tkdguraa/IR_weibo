@@ -8,10 +8,11 @@ import requests
 import jieba, json
 from math import log10
 import numpy as np
+from requests.adapters import HTTPAdapter
+from requests.packages.urllib3.util.ssl_ import create_urllib3_context
 
 from numpy.linalg import norm
 from IR_weibo.inverted_index import InvertedIndex, TagIndex
-
 
 
 # load config file
@@ -35,6 +36,7 @@ def preprocess(texts):
 # return [post_id]
 def get_candidates(Q):
     invertedIndex = InvertedIndex()
+    # return len(invertedIndex.inverted_index)
     return invertedIndex.search(Q)
 
 def extract_info(tweets, attr):
@@ -137,7 +139,7 @@ class TFIDF():
         tfidf = TFIDF.tf(t, d) * TFIDF.idf(t, D)
         return tfidf if tfidf > 0 else 0
 
-'''
+
 CIPHERS = (
     'ECDH+AESGCM:DH+AESGCM:ECDH+AES256:DH+AES256:ECDH+AES128:DH+AES:ECDH+HIGH:'
     'DH+HIGH:ECDH+3DES:DH+3DES:RSA+AESGCM:RSA+AES:RSA+HIGH:RSA+3DES:!aNULL:'
@@ -158,7 +160,7 @@ class DESAdapter(HTTPAdapter):
         context = create_urllib3_context(ciphers=CIPHERS)
         kwargs['ssl_context'] = context
         return super(DESAdapter, self).proxy_manager_for(*args, **kwargs)
-'''
+
 
 if __name__ == "__main__":
     print(get_candidates(["足球"]))
