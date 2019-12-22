@@ -21,10 +21,11 @@ algorithm: one of 'bert', 'f1', 'recall', 'bm25'
 topN:      number of tweets to return
 is_qe:     whether to expand query
 additional_attrs: attributes to consider when ranking
-return [post_id]
+attr_params: weights of additional attributes
 """
 def search(Q_str, algorithm='bert', topN=50, is_qe=False,
-           additional_attrs=['retweet_count', 'followers_count', 'post_id']):
+           additional_attrs=['retweet_count', 'followers_count', 'post_id'],
+           attr_params=[0.1, 0.1, 0.1]):
     # Query expansion & preprocess query
     Q = preprocess_query(Q_str, jieba.lcut_for_search)
     print('Q: ', Q)
@@ -41,7 +42,7 @@ def search(Q_str, algorithm='bert', topN=50, is_qe=False,
 
     tweets = load_tweets_from_db(post_ids)
     print("len(tweets)", len(tweets))
-    
+
     # Preprocess documents
     if algorithm == 'bert':
         # Extract precalculated embeddings
@@ -57,7 +58,7 @@ def search(Q_str, algorithm='bert', topN=50, is_qe=False,
     scores = similarity_score(D, Q, algorithm)
 
     # Compute overall scores including popularity
-    overall_scores = overall_score(scores, tweets, additional_attrs)
+    overall_scores = overall_score(scores, tweets, additional_attrs, attr_params)
     # overall_scores = scores
 
     # Number of candidate documents is smaller than output documents number
@@ -106,13 +107,11 @@ def load_tweets_from_db(post_id):
 
 
 def click_search(request, words, type):
-    # print(request.POST.get('words'))
     if type == 'tag':
         print("search TAG")
         invi = search_tag(words)
         print("Search results: %d data" % len(invi))
         Q = words
-
     else:
         print("search NORMAL")
 
@@ -120,10 +119,10 @@ def click_search(request, words, type):
         Main Weibo Search API
         """
         invi = search(words, algorithm='bert', topN=50, is_qe=False,
-                      additional_attrs=['retweet_count', 'followers_count', 'post_id'])
+                      additional_attrs=['retweet_count', 'followers_count', 'post_id'],
+                      attr_params=[0.1, 0.1, 0.1])
 
         Q = preprocess_query(words, jieba.lcut_for_search)
-        # print("before sort", Q)
 
         Q.sort(key = lambda i:len(i),reverse=True)
         print("Search results: %d data" % len(invi))

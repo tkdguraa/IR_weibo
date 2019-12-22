@@ -44,7 +44,7 @@ def search(Q_str, algorithm='bert', topN=10, is_qe=False,
     scores = similarity_score(D, Q, algorithm)
 
     # Compute overall scores including popularity
-    overall_scores = overall_score(scores, tweets, ['retweet_count', 'followers_count'])
+    overall_scores = overall_score(scores, tweets,['retweet_count', 'followers_count'], [0.1, 0.1])
 
     # Sort
     topN_idxs = get_topN_idxs(overall_scores, topN)
@@ -97,7 +97,7 @@ if __name__ == '__main__':
     scores = similarity_score(D, Q, algorithm)
 
     # Compute overall score including popularity
-    overall_scores = overall_score(scores, lines, ['retweet_count', 'followers_count'])
+    overall_scores = overall_score(scores, lines, ['retweet_count', 'followers_count'], [0.1, 0.1])
 #   overall_scores = overall_score(scores, lines)
 
     # Sort

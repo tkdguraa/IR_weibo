@@ -56,24 +56,14 @@ def extract_info(tweets, attr):
     except:
         return [tweet['user'][attr] for tweet in tweets]
 
-def get_corpus(post_ids, D, lines):
-    newD, mbranks, uranks = [], [], []
-    for post_id in post_ids:
-        idx = post_ids.index(post_id)
-        if len(D[idx]) > 0:
-            newD.append(D[idx])
-            mbranks.append(lines[idx]['user']['mbrank'])
-            uranks.append(lines[idx]['user']['urank'])
-    return newD, mbranks, uranks
-
 flatten = lambda l: [item for sublist in l for item in sublist]
 
 # Query Expansion
 # info_type also can be 'snippet'
-def query_expansion(Q_str, lcut_func, info_type='title', max_q_token_len=10):
+def query_expansion(Q_str, lcut_func, info_type='title', max_q_tokens_len=10):
     orig_Q = preprocess_query(Q_str, lcut_func)
     print('origQ:', orig_Q)
-    if len(orig_Q) >= max_q_token_len: return orig_Q
+    if len(orig_Q) >= max_q_tokens_len: return orig_Q
 
     url = 'https://www.googleapis.com/customsearch/v1?key=' + config['GoogleAPIKey'] \
         + '&cx=' + config['GoogleCX'] \
@@ -93,7 +83,7 @@ def query_expansion(Q_str, lcut_func, info_type='title', max_q_token_len=10):
     expanded = [item[info_type] for item in items]
     expanded_Q = list(set(flatten(preprocess(expanded, lcut_func))))
 
-    len_to_expand = max_q_token_len - len(orig_Q)
+    len_to_expand = max_q_tokens_len - len(orig_Q)
     if len(expanded_Q) > len_to_expand:
         expanded_Q = random.sample(expanded_Q, len_to_expand)
 
@@ -110,16 +100,15 @@ def get_topN_idxs(scores, topN):
 
 
 # Compute overall score including popularity
-alpha = 0.1
-def overall_score(scores, tweets, attrs=[]):
-    for attr in attrs:
+def overall_score(scores, tweets, attrs=[], params=[]):
+    for (attr, param) in zip(attrs, params):
         additional_scores = np.array(extract_info(tweets, attr), dtype=np.int64)
         normalized_scores = additional_scores / np.linalg.norm(additional_scores)
         print('normalized additional scores', normalized_scores)
-        scores += alpha * normalized_scores
+        scores += param * normalized_scores
     return scores
 
-##### Feature Extraction - TFIDF #####
+# Feature Extraction - TFIDF
 # t is token
 # d is document (tokens)
 # D is documents
