@@ -90,7 +90,7 @@ DATABASES = {
     },
 }
 import mongoengine
-conn = mongoengine.connect("mblogdb", host='127.0.0.1')
+conn = mongoengine.connect("weibodata", host='127.0.0.1')
 
 # Password validation
 # https://docs.djangoproject.com/en/2.0/ref/settings/#auth-password-validators

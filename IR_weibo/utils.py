@@ -1,24 +1,23 @@
-import sys
-sys.path.append('../')
+import sys, os
+sys.path.append('..')
 
 import random
 import requests
 import jieba, json
 from math import log10
 import numpy as np
-from requests.adapters import HTTPAdapter
-from requests.packages.urllib3.util.ssl_ import create_urllib3_context
 
 from numpy.linalg import norm
-from inverted_index import InvertedIndex, TagIndex
+from IR_weibo.inverted_index import InvertedIndex, TagIndex
+
 
 
 # load config file
-with open('config.json', 'r') as f:
+with open('../IR_weibo/config.json', 'r') as f:
     config = json.load(f)
 
 # read stopwords
-stopwords = [line.strip() for line in open('stopwords.txt', encoding='UTF-8').readlines()]
+stopwords = [line.strip() for line in open('../IR_weibo/stopwords.txt', encoding='UTF-8').readlines()]
 
 # Preprocessing
 def preprocess(texts):
@@ -136,11 +135,13 @@ class TFIDF():
         tfidf = TFIDF.tf(t, d) * TFIDF.idf(t, D)
         return tfidf if tfidf > 0 else 0
 
+'''
 CIPHERS = (
     'ECDH+AESGCM:DH+AESGCM:ECDH+AES256:DH+AES256:ECDH+AES128:DH+AES:ECDH+HIGH:'
     'DH+HIGH:ECDH+3DES:DH+3DES:RSA+AESGCM:RSA+AES:RSA+HIGH:RSA+3DES:!aNULL:'
     '!eNULL:!MD5'
 )
+
 
 class DESAdapter(HTTPAdapter):
     """
@@ -155,3 +156,4 @@ class DESAdapter(HTTPAdapter):
         context = create_urllib3_context(ciphers=CIPHERS)
         kwargs['ssl_context'] = context
         return super(DESAdapter, self).proxy_manager_for(*args, **kwargs)
+'''

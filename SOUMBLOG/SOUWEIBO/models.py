@@ -8,11 +8,10 @@ class tweeter(mongoengine.Document):
     collect_count = mongoengine.StringField()
     hash = mongoengine.StringField()
     origin_text = mongoengine.StringField()
-    post_id = mongoengine.IntField()
+    post_id = mongoengine.StringField()
     retweet_count = mongoengine.StringField()
     text = mongoengine.StringField()
     theme = mongoengine.StringField()
     user = mongoengine.DictField()
     pics = mongoengine.ListField()
-
-    
+    vec = mongoengine.ListField()
