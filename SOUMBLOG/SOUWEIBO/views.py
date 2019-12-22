@@ -96,10 +96,13 @@ def load_tweets_from_db(post_id):
         data_list.append(data)
     return data_list
 
-def click_search(request, words, page):
+def click_search(request, words, page, type):
     # print(request.POST.get('words'))
-    if words[0] == '#' and words[-1] == '#':
-        print(words.strip('#'))
+    if type == 'tag':
+        print("TAG TODO")
+    else:
+        print("NORMAL TODO")
+
     invi = search(words, algorithm='bert', topN=10, is_qe=False)
     Q = query_expansion(words, jieba.lcut_for_search, 'title', False) #获取搜索输入的分词集
     Q = list(Q)
@@ -124,6 +127,7 @@ def click_search(request, words, page):
                 "user": x['user'],
                 "search": words,
                 "divided": Q,
+                "type": type,
             }
             data_list.append(data)
     else:
@@ -143,6 +147,7 @@ def click_search(request, words, page):
                 "user": x['user'],
                 "search": words,
                 "divided": Q,
+                "type": type,
             }
             data_list.append(data)
 

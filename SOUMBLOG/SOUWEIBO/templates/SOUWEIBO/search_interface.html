@@ -33,23 +33,11 @@
     <script>
         var data_list = {{datas|safe}}
         var i = 0
-        var post_id = "4448077517292156"
-        var text = "一会见<span class=\"url-icon\"><img alt=[酷] src=\"//h5.sinaimg.cn/m/emoticon/icon/default/d_ku-6fa1a42f7b.png\" style=\"width:1em; height:1em;\" /></span><span class=\"url-icon\"><img alt=[酷] src=\"//h5.sinaimg.cn/m/emoticon/icon/default/d_ku-6fa1a42f7b.png\" style=\"width:1em; height:1em;\" /></span><span class=\"url-icon\"><img alt=[酷] src=\"//h5.sinaimg.cn/m/emoticon/icon/default/d_ku-6fa1a42f7b.png\" style=\"width:1em; height:1em;\" /></span> "
-        var pics = ["https://wx2.sinaimg.cn/orj360/007dMLSxly1g9rnuom0edj30gr0c075h.jpg",
-          "https://wx2.sinaimg.cn/orj360/007dMLSxly1g9rnuq09ixj30jg0ffar4.jpg",
-          "https://wx4.sinaimg.cn/orj360/007dMLSxly1g9rnurq97bj30jg0dp4ah.jpg",
-          "https://wx4.sinaimg.cn/orj360/007dMLSxly1g9rnuucckpj30jg0db17l.jpg",
-          "https://wx1.sinaimg.cn/orj360/007dMLSxly1g9rnuuw0lqj30dq09iq6m.jpg"]
-        var image = "https://wx3.sinaimg.cn/orj480/007dMLSxly8g91zs33ujoj30u00u0jvl.jpg"
-        var screen_name = "综艺达人胡艺凡"
-        var retweet_count = 49
-        var like = 605
-
         $(document).ready(function(){
             var cnt = 0
             var get_len = 0
             for(i = 0; i < window.location.pathname.length; i++){
-              if(cnt == 3)
+              if(cnt == 4)
                 get_len = i
               if(window.location.pathname[i] == '/')
                   cnt = cnt + 1
@@ -60,6 +48,8 @@
               //$("#search_box")[0].style.marginTop = "-20%"
               var tweeter_total_num = {{number|safe}}
               var words = data_list[0]['search']
+              var search_type = data_list[0]['type']
+              var input
               $("#search_box").append("<div class=result></div>")
               for(i = 0; i < 5; i++){
                 var post_id = data_list[i]['post_id']
@@ -98,7 +88,17 @@
               if($("#search").val() == "")
                 alert("输入不能为空!")
               else
-                window.location.href="/search/" + $("#search").val() + "/1" 
+                if($("#search").val()[0] == '#' && $("#search").val()[$("#search").val().length - 1] == '#'){
+                  search_type = 'tag'
+                  input = $("#search").val()
+                  var reg = new RegExp("#","g");
+                  input = input.replace(reg,"");
+                }
+                else{
+                  search_type = 'normal'
+                  input = $("#search").val()
+                }
+                window.location.href="/search/" + input + "/" + search_type + "/1" 
             });
             cnt_limit = 0
             console.log(current)
@@ -107,7 +107,7 @@
             console.log(now_page, page_num)
             page_list = parseInt(page_num / 5);
             if(now_page > 0)      
-              $('.page').append("<a href=/search/" + search + '/' + ((now_page - 1) * 5 + 1) + " id=prev>上一页&nbsp&nbsp&nbsp</a>");
+              $('.page').append("<a href=/search/" + words + "/" + search_type + '/' + ((now_page - 1) * 5 + 1) + " id=prev>上一页&nbsp&nbsp&nbsp</a>");
 
             for(var i = (now_page * 5); i <= page_num; i++){
               $('div.page').append("<a class='pagenum' href='javascript:void(0);' id=P" + ( i + 1 ) + ">" + (i + 1) + "&nbsp&nbsp&nbsp</a>");
@@ -118,7 +118,7 @@
             }
             $('#P' + current).css('color','black');
             if(parseInt(page_list) > now_page)
-              $('div.page').append("<a href=/search/" + search + '/' + ((now_page + 1) * 5 + 1) + " id=next>下一页</a>");
+              $('div.page').append("<a href=/search/" + words + "/" + search_type + '/' + ((now_page + 1) * 5 + 1) + " id=next>下一页</a>");
 
             
             $(document).on('click','#prev',function(){
@@ -131,7 +131,7 @@
                 $(this).css('color','');
               });
               $(this).css('color','black');
-              window.location = '/search/' + words + '/' + this.id.substr(1);
+              window.location = '/search/' + words + '/' + search_type + '/' + this.id.substr(1);
             });
         });
     </script>
