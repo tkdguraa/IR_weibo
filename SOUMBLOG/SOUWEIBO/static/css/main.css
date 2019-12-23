@@ -819,9 +819,11 @@ legend {
   -ms-flex-align: center;
       align-items: center;
   font-family: 'Poppins', sans-serif;
-  background-color: #a598ee;
   background-size: cover;
   background-position: center center;
+  width:50%;
+  background-color: #c9f0f5;
+  margin-left:25%;
   padding: 15px;
 }
 
@@ -832,7 +834,6 @@ legend {
 }
 
 .s003 form .inner-form {
-  background: #fff;
   display: -ms-flexbox;
   display: flex;
   width: 100%;
@@ -840,7 +841,7 @@ legend {
       justify-content: space-between;
   -ms-flex-align: center;
       align-items: center;
-  box-shadow: 0px 8px 20px 0px rgba(0, 0, 0, 0.15);
+  /* box-shadow: 0px 8px 20px 0px rgba(0, 0, 0, 0.15); */
   border-radius: 3px;
 }
 
@@ -854,8 +855,8 @@ legend {
   border: 0;
   display: block;
   width: 100%;
-  padding: 10px 32px;
-  font-size: 16px;
+  padding: 25px;
+  font-size: 28px;
   color: #555;
 }
 
@@ -946,7 +947,7 @@ legend {
 
 .s003 form .inner-form .input-field.first-wrap .choices__list--dropdown .choices__item--selectable.is-highlighted {
   background: #fff;
-  color: #63c76a;
+  color: #8000ff;
 }
 
 .s003 form .inner-form .input-field.first-wrap .choices__list--dropdown .choices__item {
@@ -956,11 +957,15 @@ legend {
 
 .s003 form .inner-form .input-field.second-wrap {
   -ms-flex-positive: 1;
-      flex-grow: 1;
+  flex-grow: 1;
+  box-shadow: 0px 8px 20px 0px rgba(0, 0, 0, 0.15);
+  background-color: white
 }
 
 .s003 form .inner-form .input-field.third-wrap {
   width: 74px;
+  box-shadow: 0px 8px 20px 0px rgba(0, 0, 0, 0.15);
+
 }
 
 .s003 form .inner-form .input-field.third-wrap .btn-search {
@@ -970,16 +975,16 @@ legend {
   color: #fff;
   border: 0;
   cursor: pointer;
-  background: #63c76a;
+  background: rgb(50,50,50);
   transition: all .2s ease-out, color .2s ease-out;
 }
 
 .s003 form .inner-form .input-field.third-wrap .btn-search svg {
-  width: 16px;
+  width: 28px;
 }
 
 .s003 form .inner-form .input-field.third-wrap .btn-search:hover {
-  background: #50c058;
+  background: rgb(50,50,50);
 }
 
 .s003 form .inner-form .input-field.third-wrap .btn-search:focus {
@@ -1028,4 +1033,73 @@ legend {
     margin-bottom: 0;
     width: 100%;
   }
+}
+div.result{
+  width: 100%;
+  text-align: center;
+  color: black;
+  border-radius: 20px;
+}
+div.blank_result{
+  width: 100%;
+  height: 500px;
+  text-align: center;
+  color: black;
+  border-radius: 20px;
+}
+div.text{
+  text-align:left;
+  margin-left:2%;
+  font-size:18px;
+}
+div.tweeter {
+  background: white;
+  width: 100%;
+  text-align: center;
+  color: black;
+  border-radius: 20px;
+  box-shadow: 0px 8px 20px 0px rgba(0, 0, 0, 0.15);
+}
+div.profile{
+  width:10%;
+  margin-left:0px;
+}
+img.image{
+  width: 50px;
+  height: 50px;
+  margin-top:7%;
+  border-radius: 100%;
+}
+div.name{
+  position: absolute;
+  margin-left:75px;
+  margin-top:-1.8%;
+}
+div.pics{
+  text-align:left;
+  width:75%;
+}
+div.info{
+  text-align:right;
+  margin-right:2%;
+}
+img.pictures{
+  width:150px;
+  height:150px;
+  margin-left:3%;
+  margin-top:3%;
+}
+img.pictures{
+  width:150px;
+  height:150px;
+  margin-left:3%;
+  margin-top:3%;
+}
+img.biglogo{
+  position: absolute;
+  margin-top:-14%;
+  visibility:hidden;
+}
+a{
+  text-decoration: none;
 }

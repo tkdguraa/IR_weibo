@@ -76,7 +76,11 @@ def search_tag(Q_str, topN=50):
 
 
 def search_interface(request):
-    return render(request, 'SOUWEIBO/search_interface.html', {'datas': [], 'number': 0})
+    info = dict()
+    info['search'] = ''
+    info['divided'] = ''
+    info['type'] = 'normal'
+    return render(request, 'SOUWEIBO/search_interface.html', {'datas': [], 'number': 0,'info': info})
 
 
 def load_tweets_from_db(post_id):
@@ -122,6 +126,7 @@ def click_search(request, words, type):
         data['search'] = words
         data['divided'] = Q
         data['type'] = type
+        del data['vec']
         data_list.append(data)
 
     info = dict()
