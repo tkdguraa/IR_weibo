@@ -725,23 +725,18 @@ div.name{
 }
 div.pics{
   text-align:left;
-  width:75%;
+  width:100%;
 }
 div.info{
   text-align:right;
     padding-top: 4%;
 }
 img.pictures{
-  width:150px;
-  height:150px;
+  width:140px;
+  height:140px;
   margin-left:3%;
   margin-top:3%;
-}
-img.pictures{
-  width:150px;
-  height:150px;
-  margin-left:3%;
-  margin-top:3%;
+    object-fit: cover;
 }
 img.biglogo{
   position: absolute;
