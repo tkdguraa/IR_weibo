@@ -156,6 +156,7 @@
               console.log("test", current)
               display(data_list, (parseInt(current / 5) - 1) * 5 + 1)
               current = (parseInt(current / 5) - 1) * 5 + 1
+              document.body.scrollTop =document.documentElement.scrollTop = 0;
             });
             $(document).on('click','#next',function(){
               cnt_limit = 0;
@@ -163,6 +164,7 @@
               display(data_list, (parseInt(current / 6) + 1) * 5 + 1)
               current = (parseInt(current / 6) + 1) * 5 + 1
               console.log("currrrentttt", current)
+              document.body.scrollTop =document.documentElement.scrollTop = 0;
             });
             $(document).on('click','.pagenum',function(){
               $('.pagenum').each(function(){
