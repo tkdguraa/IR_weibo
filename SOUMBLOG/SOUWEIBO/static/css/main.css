@@ -1106,6 +1106,9 @@ img.biglogo{
   visibility:hidden;
   width: 50%;
 }
+.search_box{
+  visibility:hidden;
+}
 a{
   text-decoration: none;
 }
