@@ -114,7 +114,7 @@ def read_data(tweeter):
     invertedIndex = InvertedIndex(newIndex=True)
     tagIndex = TagIndex(newIndex=True)
 
-    path =  open('tweets_with_embeddings.pickle','rb')
+    path =  open('tweets_with_embeddings_final.pickle','rb')
     text_dict = {}
     tag_dict = {}
     user_dict = {}

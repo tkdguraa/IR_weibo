@@ -58,6 +58,7 @@ def get_parse(info, theme):
     if isLongText:
         try:
             text = requests.get("https://m.weibo.cn/statuses/extend?id=" + post_id).json()['data']['longTextContent']
+            origin_text = text
         except:
             print("request_error")
             return []
