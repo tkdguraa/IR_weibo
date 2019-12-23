@@ -22,7 +22,7 @@ with open('../IR_weibo/config.json', 'r') as f:
 # read stopwords
 stopwords = [line.strip() for line in open('../IR_weibo/stopwords.txt', encoding='UTF-8').readlines()]
 
-# Preprocessing
+# Preprocess documents
 def preprocess(texts, lcut_func):
     D = []
     for text in texts:
@@ -31,6 +31,11 @@ def preprocess(texts, lcut_func):
         if tokens == []: tokens = ['。'] # tokens cannot be empty
         D.append(tokens)
     return D
+
+# Preprocess query
+def preprocess_query(Q_str, lcut_func):
+    return list(set(preprocess([Q_str], lcut_func)[0]))
+
 
 # Find documents that overlaps with keywords of original query
 # return [post_id]
@@ -51,25 +56,14 @@ def extract_info(tweets, attr):
     except:
         return [tweet['user'][attr] for tweet in tweets]
 
-def get_corpus(post_ids, D, lines):
-    newD, mbranks, uranks = [], [], []
-    for post_id in post_ids:
-        idx = post_ids.index(post_id)
-        if len(D[idx]) > 0:
-            newD.append(D[idx])
-            mbranks.append(lines[idx]['user']['mbrank'])
-            uranks.append(lines[idx]['user']['urank'])
-    return newD, mbranks, uranks
-
 flatten = lambda l: [item for sublist in l for item in sublist]
 
 # Query Expansion
 # info_type also can be 'snippet'
-def query_expansion(Q_str, lcut_func, info_type='title', flag=True, max_q_len=25):
-    if flag is False: return set(preprocess([Q_str], lcut_func)[0])
-
-    Q = set(preprocess([Q_str], lcut_func)[0])
-    if len(Q) >= max_q_len: return Q
+def query_expansion(Q_str, lcut_func, info_type='title', max_q_tokens_len=10):
+    orig_Q = preprocess_query(Q_str, lcut_func)
+    print('origQ:', orig_Q)
+    if len(orig_Q) >= max_q_tokens_len: return orig_Q
 
     url = 'https://www.googleapis.com/customsearch/v1?key=' + config['GoogleAPIKey'] \
         + '&cx=' + config['GoogleCX'] \
@@ -87,14 +81,13 @@ def query_expansion(Q_str, lcut_func, info_type='title', flag=True, max_q_len=25
     r = json.loads(response.text)
     items = r['items']
     expanded = [item[info_type] for item in items]
-    expanded_Q = set(flatten(preprocess(expanded, lcut_func)))
+    expanded_Q = list(set(flatten(preprocess(expanded, lcut_func))))
 
-    len_to_expand = max_q_len - len(Q)
+    len_to_expand = max_q_tokens_len - len(orig_Q)
     if len(expanded_Q) > len_to_expand:
         expanded_Q = random.sample(expanded_Q, len_to_expand)
 
-    print('expanded_Q:', expanded_Q)
-    newQ = Q.union(expanded_Q)
+    newQ = orig_Q + expanded_Q
     return newQ
 
 def get_topN_idxs(scores, topN):
@@ -102,22 +95,20 @@ def get_topN_idxs(scores, topN):
     # O(n)
     unordered_topN_idxs = np.argpartition(scores, -topN)[-topN:]
     # O(klogk), k=topN
-    print("unorder", unordered_topN_idxs)
-    print("score_len", len(scores))
     ordered_topN_idxs = unordered_topN_idxs[np.argsort(scores[unordered_topN_idxs])][::-1]
     return ordered_topN_idxs
 
 
 # Compute overall score including popularity
-alpha = 0.1
-def overall_score(scores, tweets, attrs=[]):
-    for attr in attrs:
-        additional_scores = extract_info(tweets, attr)
+def overall_score(scores, tweets, attrs=[], params=[]):
+    for (attr, param) in zip(attrs, params):
+        additional_scores = np.array(extract_info(tweets, attr), dtype=np.int64)
         normalized_scores = additional_scores / np.linalg.norm(additional_scores)
-        scores += alpha * normalized_scores
+        print('normalized additional scores', normalized_scores)
+        scores += param * normalized_scores
     return scores
 
-##### Feature Extraction - TFIDF #####
+# Feature Extraction - TFIDF
 # t is token
 # d is document (tokens)
 # D is documents

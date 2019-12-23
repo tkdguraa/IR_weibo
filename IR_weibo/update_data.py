@@ -24,10 +24,6 @@ theme_list = [
         "name": "情感"
     },
     {
-        "id": 4288,
-        "name": "明星"
-    },
-    {
         "id": 4188,
         "name": "社会"
     },
@@ -64,6 +60,7 @@ def update_data(tweeter):
         print('Search for %s' %theme['name'])
         tag_dict = {}
         text_dict = {}
+        user_dict = {}
         try:
             res = requests.get("https://m.weibo.cn/api/container/getIndex?containerid=102803_ctg1_" + str(theme['id']) + "_-_ctg1_" + str(theme['id']) + "&openApp=0")
             for i in range(0, len(res.json()["data"]["cards"])):
@@ -71,6 +68,7 @@ def update_data(tweeter):
                 if tweeter.find(filter={'post_id':post_id}).count() == 0:
                     data = get_parse(res.json()["data"]["cards"][i], theme["name"])
                     if data != []:
+                        # print(data)
                         character_count = data['character_count']
                         collect_count = str(data['collect_count'])
                         hash = data['hash']
@@ -90,6 +88,7 @@ def update_data(tweeter):
 
                             text_dict[post_id] = text #D={key: value}, key:在数据库中该微博的序号， value:文本
                             tag_dict[post_id] = hash #D={key: value}, key:在数据库中该微博的序号， value:tags
+                            user_dict[user['screen_name']] = user['followers_count']
                         print("Post_id =", post_id, "is added.")
                         print(tweeter.count())
                 else:
@@ -118,6 +117,7 @@ def read_data(tweeter):
     path =  open('tweets_with_embeddings.pickle','rb')
     text_dict = {}
     tag_dict = {}
+    user_dict = {}
 
     try:
         while True:
@@ -140,6 +140,7 @@ def read_data(tweeter):
                                 'theme': theme_, 'user': user, 'vec': D_vector})
                 text_dict[post_id] = text
                 tag_dict[post_id] = hash
+                user_dict[user['screen_name']] = user['followers_count']
                 # print(text_dict)
     except:
         pass

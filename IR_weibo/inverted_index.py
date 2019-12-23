@@ -113,6 +113,44 @@ class TagIndex:
         return res
 
 
+class UserIndex:
+
+    def __init__(self, indexPath=args.user_index_path, newIndex = args.new_tag_index):
+        self.user_index = dict()
+        self.indexPath = indexPath
+        try:
+            if not newIndex:
+                print('Load a old tag index')
+                if os.path.exists(indexPath):
+                    with open(indexPath, 'r', encoding='UTF-8') as fin:
+                        self.user_index = json.load(fin)
+            else:
+                print('Start a new user index')
+        except Exception as _:
+            self.user_index = dict()
+
+    def update_user_index(self, D):
+        for word in D:
+            if word.strip() == '':
+                continue
+            if word not in self.user_index:
+                self.user_index[word] = D[word]
+
+        self.save_index()
+
+    def save_index(self):
+        with open(self.indexPath, 'w', encoding='UTF-8') as fout:
+            json.dump(self.user_index, fout, ensure_ascii=False)
+
+    def search(self, Q):
+        res = set()
+        for q in Q:
+            if q in self.user_index:
+                res.update(self.user_index[q])
+        res = list(res)
+        res.sort(reverse=True)
+        return res
+
 
 class JsonEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -130,8 +168,9 @@ class JsonEncoder(json.JSONEncoder):
 
 if __name__ == '__main__':
     # print(args.extract_keywords)
-    invertedIndex = InvertedIndex(indexPath='indexfile/test_inverted.txt')
-    tagIndex = TagIndex(indexPath='indexfile/test_tag.txt')
+    invertedIndex = InvertedIndex(indexPath='indexfile/test_inverted.txt', newIndex=True)
+    tagIndex = TagIndex(indexPath='indexfile/test_tag.txt', newIndex=True)
+    userIndex = UserIndex(indexPath='indexfile/test_user.txt', newIndex=True)
     D = dict()
     D.setdefault('0', '关晓彤吴刚同框# #关晓彤渐变抹胸裙# 第六届中国电视好演员年度盛典红毯，“国民好书记”@吴刚de微博 与“国民闺女”@关晓彤 同框啦~闺女今天这身裙子好漂亮[舔屏]')
     D.setdefault('1', '#新鲜事每日精选# 小鲜今日推荐新鲜事top3：\
@@ -151,9 +190,17 @@ if __name__ == '__main__':
     print(invertedIndex.inverted_index)
     print(tagIndex.tag_index)
     print(invertedIndex.search(['关晓彤']))
+
+    D3 = dict()
+    D3.setdefault('dasds', 121)
+    D3.setdefault('fsdf', 1212)
+    # print(D3)
+    userIndex.update_user_index(D3)
+    print(userIndex.user_index)
     # vec = [121.212, 212.121,121.212]
     # vecstr = "/".join(map(str, vec))
     # print(vecstr)
     # vecRestore = list(map(float, vecstr.split('/')))
     # print(vecRestore)
+
 
