@@ -12,10 +12,10 @@
   </head>
   <body>
     <div class="s003" id="total">
-      <img src="/static/image/logo.png" class="biglogo" id="biglogo">
+      <img src="/static/image/mainlogo.png" class="biglogo" id="biglogo">
       <form id="search_box">
         <div class="inner-form">
-            <img src="/static/image/logo.png" height=68px width=80px id ="smalllogo">
+            <img src="/static/image/logo.png" height=55px width=80px id ="smalllogo">
           <div class="input-field second-wrap">
             <input id="search" type="text" placeholder="Enter Keywords?" />
           </div>
@@ -71,7 +71,7 @@
             $("#tw" + i).append("<div class=text>" + text + "</div>")
             $("#tw" + i).append("<br>")
             $("#tw" + i).append("<div class content><div class=pics id = " + i + "></div><content>")
-            $("#tw" + i).append("<div class=info><a href= https://m.weibo.cn/detail/" + data_list[i]['post_id'] + ">跳转&nbsp;&nbsp;&nbsp;&nbsp;</a> 转发" + retweet_count + " &nbsp;&nbsp;&nbsp;&nbsp;点赞 " + like + "</div>")
+            $("#tw" + i).append("<div class=info><a href= https://m.weibo.cn/detail/" + data_list[i]['post_id'] + ">跳转&nbsp;&nbsp;&nbsp;&nbsp;</a> 转发 " + retweet_count + " &nbsp;&nbsp;&nbsp;&nbsp;点赞 " + like + "</div>")
 
             for(j = 0; j < pics.length; j++){
               $("#" + i).append("<img src=" + pics[j] + " class = pictures>")
