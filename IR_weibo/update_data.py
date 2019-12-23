@@ -9,6 +9,7 @@ import requests
 from IR_weibo.relevance import BERT_embedding
 from IR_weibo.inverted_index import InvertedIndex, TagIndex
 from IR_weibo.crawler_theme import get_parse
+from IR_weibo.config import  args
 
 theme_list = [
     {
@@ -168,7 +169,8 @@ if __name__ == "__main__":
 
     # for item in collection.find():
     # print(collection.count())
-    read_data(collection)
+    if not args.update:
+        read_data(collection)
 
     while 1:
         update_data(collection)
