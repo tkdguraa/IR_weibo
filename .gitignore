@@ -124,6 +124,6 @@ venv.bak/
 .DS_Store
 
 IR_weibo/*.pickle
-
+IR_weibo/indexfile/*.txt
 
 
