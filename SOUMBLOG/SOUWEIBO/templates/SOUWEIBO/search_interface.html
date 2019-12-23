@@ -13,7 +13,8 @@
   <body>
     <div class="s003" id="total">
       <img src="/static/image/mainlogo.png" class="biglogo" id="biglogo">
-      <form id="search_box">
+      <form id="search_box" onkeydown="JavaScript:Enter_Check();">
+        <input style="display:none"/>
         <div class="inner-form">
             <img src="/static/image/logo.png" height=55px width=80px id ="smalllogo">
 
@@ -106,6 +107,12 @@
         var tweeter_total_num = {{number|safe}}
         var i = 0
         var current = 1
+        function Enter_Check(){
+          console.log("hello")
+          if(event.keyCode == 13){
+              $('#go').click()
+          }
+        }
         $(document).ready(function(){
             if(data_list.length != 0){
               display(data_list,current)
