@@ -1100,6 +1100,9 @@ img.biglogo{
   margin-top:-14%;
   visibility:hidden;
 }
+.search_box{
+  visibility:hidden;
+}
 a{
   text-decoration: none;
 }

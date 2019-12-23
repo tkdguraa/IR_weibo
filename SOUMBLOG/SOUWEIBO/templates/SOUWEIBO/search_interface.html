@@ -13,9 +13,9 @@
   <body>
     <div class="s003" id="total">
       <img src="/static/image/logo.png" class="biglogo" id="biglogo">
-      <form id="search_box">
+       <form id="search_box" class="search_box">
         <div class="inner-form">
-            <img src="/static/image/logo.png" height=68px width=80px id ="smalllogo">
+          <img src="/static/image/logo.png" height=68px width=80px id ="smalllogo">
           <div class="input-field second-wrap">
             <input id="search" type="text" placeholder="Enter Keywords?" />
           </div>
@@ -36,10 +36,9 @@
     <script>
         function display(data_list, cur){
           var search_info = {{info|safe}}
-
           $('.result').remove()
           $("#search_box").append("<div class=result></div>")
-          console.log(data_list[0]['words'])
+          
           var tweeter_total_num = {{number|safe}}
           idx_len = 5
           if(data_list.length < 5)
@@ -84,7 +83,7 @@
           console.log(now_page, page_num)
           page_list = parseInt(page_num / 5);
           if(now_page > 0)      
-            $('.page').append("<a href='javascript:void(0);' id=prev>上一页&nbsp&nbsp&nbsp</a>");
+            $('.page').append("<a href='javascript:void(0);' id=prev><<&nbsp&nbsp&nbsp</a>");
 
           cnt_limit = 0
           for(var i = (now_page * 5) + 1; i <= page_num; i++){
@@ -97,8 +96,9 @@
           $('#P' + cur).css('color','black');
           if(parseInt(page_list) > now_page + 1){
             console.log("YEYEYA")
-            $('.page').append("<a id=next href='javascript:void(0);'>下一页</a>");
+            $('.page').append("<a id=next href='javascript:void(0);'> >> </a>");
           }
+          $('#search_box').css('visibility','visible');
         }
         var search_info = {{info|safe}}
         var data_list = {{datas|safe}}
@@ -117,10 +117,11 @@
                   else
                     $('#search').val(search_info['search'])
                   $("#search_box").append("<div class=blank_result>没有搜索结果</div>")
+                  $('#search_box').css('visibility','visible');
                 }
                 else{
-                  console.log("hello")
                   $('#biglogo').css('visibility','visible');
+                  $('#search_box').css('visibility','visible');
                   $('#smalllogo').remove();
                 }
             }
@@ -151,8 +152,8 @@
             $(document).on('click','#next',function(){
               cnt_limit = 0;
               console.log("test", current)
-              display(data_list, (parseInt(current / 5) + 1) * 5 + 1)
-              current = (parseInt(current / 5) + 1) * 5 + 1
+              display(data_list, (parseInt(current / 6) + 1) * 5 + 1)
+              current = (parseInt(current / 6) + 1) * 5 + 1
               console.log("currrrentttt", current)
             });
             $(document).on('click','.pagenum',function(){
