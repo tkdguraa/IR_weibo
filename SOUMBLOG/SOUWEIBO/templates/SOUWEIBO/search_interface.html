@@ -81,9 +81,9 @@
           $("div.result").append("<br></br>")
           $("div.result").append("<div class=page></div>")
           now_page = parseInt((cur - 1)/5)
-          page_num = parseInt(tweeter_total_num / 5);
+          page_num = parseInt((tweeter_total_num - 1) / 5);
           console.log(now_page, page_num)
-          page_list = parseInt(page_num / 5);
+          page_list = parseInt((page_num - 1) / 5);
           if(now_page > 0)      
             $('.page').append("<a href='javascript:void(0);' id=prev><<&nbsp&nbsp&nbsp</a>");
 
@@ -96,7 +96,7 @@
             cnt_limit++;
           }
           $('#P' + cur).css('color','black');
-          if(parseInt(page_list) > now_page + 1){
+          if(parseInt(page_list) > now_page){
             console.log("YEYEYA")
             $('.page').append("<a id=next href='javascript:void(0);'> >> </a>");
           }
@@ -171,6 +171,7 @@
               $(this).css('color','black');
               current = this.id.substr(1)
               var data_list = {{datas|safe}}
+              document.body.scrollTop =document.documentElement.scrollTop = 0;
               display(data_list, current)
             });
         });
