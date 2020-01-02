@@ -52,7 +52,7 @@ def search(Q_str, algorithm='bert', topN=10, is_qe=False,
     return result_post_ids
 
 if __name__ == '__main__':
-    with open('tweets.pickle', 'rb') as f:
+    with open('tweets_with_embeddings_final.pickle', 'rb') as f:
         lines = []
         while True:
             try:
