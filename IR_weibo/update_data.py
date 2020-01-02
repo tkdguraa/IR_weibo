@@ -104,8 +104,7 @@ def update_data(tweeter):
         tagIndex.update_tag_index(tag_dict)
         print("Inverted index length: %d" % len(invertedIndex.inverted_index))
         print("Tag index length: %d" % len(tagIndex.tag_index))
-        # print(invertedIndex.inverted_index)
-        # print(tagIndex.tag_index)
+
 
 
 
@@ -141,7 +140,6 @@ def read_data(tweeter):
                 text_dict[post_id] = text
                 tag_dict[post_id] = hash
                 user_dict[user['screen_name']] = user['followers_count']
-                # print(text_dict)
     except:
         pass
 
@@ -151,8 +149,7 @@ def read_data(tweeter):
     tagIndex.update_tag_index(tag_dict)
     print("Inverted index length: %d" %len(invertedIndex.inverted_index))
     print("Tag index length: %d" % len(tagIndex.tag_index))
-    # print(invertedIndex.inverted_index)
-    # print(tagIndex.tag_index)
+
 
 
 if __name__ == "__main__":
@@ -167,8 +164,6 @@ if __name__ == "__main__":
     #连接所用集合，也就是我们通常所说的表，test为表名
     collection=db.tweeter
 
-    # for item in collection.find():
-    # print(collection.count()) 
     read_data(collection)
 
     while 1:
