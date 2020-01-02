@@ -159,15 +159,16 @@ if __name__ == "__main__":
     #建立MongoDB数据库连接
     client = MongoClient('localhost',27017)
 
+    client.drop_database("weibodata")
+
     #连接所需数据库,test为数据库名
     db=client.weibodata
 
     #连接所用集合，也就是我们通常所说的表，test为表名
-
     collection=db.tweeter
 
     # for item in collection.find():
-    # print(collection.count())
+    # print(collection.count()) 
     read_data(collection)
 
     while 1:
