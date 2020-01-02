@@ -32,14 +32,6 @@ def search(Q_str, algorithm='bert', topN=50, is_qe=False,
 
     # Find tweets that overlaps with keywords of original query
     post_ids = get_candidates(list(Q))
-
-    # print("before", post_ids)
-
-    # print(type(post_ids[0]))
-    # num = tweeter.objects.filter(post_id=str(post_ids[0]))
-    # print("www", len(num))
-    # print("posts", post_ids)
-
     tweets = load_tweets_from_db(post_ids)
     print("len(tweets)", len(tweets))
 
