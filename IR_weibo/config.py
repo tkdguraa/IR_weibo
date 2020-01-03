@@ -10,6 +10,7 @@ parser.add_argument('--new_inverted_index', default=False, action="store_true", 
 parser.add_argument('--new_tag_index', default=False, action="store_true", help='If start a new tag indexfile.')
 parser.add_argument('--extract_keywords', action="store_true", default=False, help='when cut words, extracting words or not.')
 parser.add_argument('-r', '--relevance', default='bm25', help='method to calculate relevance', type=str)
+parser.add_argument('--update', default=False, action="store_true", help='whether only to update index file.')
 # parser.add_argument('runserver', default=False, help='')
 # bm25, f1score, recall, bert + cossin
 
