@@ -17,13 +17,11 @@ def give_emoji_free_text(text):
 
     return text
 def get_parse(info, theme):
-    # print(info)
-    # print(res.json()['data']['cards'][1])
-    # res = requests.get("https://m.weibo.cn/api/container/getIndex?containerid=102803_ctg1_4888_-_ctg1_4888&openApp=0")
+
     id = info['mblog']['user']['id']
     gender = info['mblog']['user']['gender']
-    mbrank = info['mblog']['user']['mbrank'] #vipç­çş§
-    urank = info['mblog']['user']['urank'] #ĺžŽĺç­çş§
+    mbrank = info['mblog']['user']['mbrank'] 
+    urank = info['mblog']['user']['urank'] 
     screen_name = info['mblog']['user']['screen_name']
     statuses_count = info['mblog']['user']['statuses_count']
     followers_count = info['mblog']['user']['followers_count']
@@ -95,13 +93,8 @@ def get_parse(info, theme):
     "hash": hash
     }
 
-    # data.append(ndata)
-    # pickle.dump(ndata,f_pk)
-    # json.dump(ndata, f_json, ensure_ascii=False,sort_keys=True, indent=5)
     return ndata
 
-    # print(len(res.json()["data"]["cards"]))
-    # print(res.json())
 
 
 
@@ -177,7 +170,6 @@ def auto_search():
             print("request error")
             time.sleep(10)
 
-# crawl_user("5593273852")
 
 if __name__ == "__main__":
     path =  open('data/emb_json4.pickle','rb')
@@ -231,16 +223,4 @@ if __name__ == "__main__":
             "theme": "游戏"
         },
     ]
-    # res = requests.get("https://m.weibo.cn/api/container/getIndex?containerid=102803_ctg1_4888_-_ctg1_4888&openApp=0")
-    # print(res.json()["data"]["cards"][0]['mblog']['id'])
-    # print(res.json()['data']['cards'][2]['mblog']['reposts_count'])
-    #https://m.weibo.cn/api/container/getIndex?containerid=102803_ctg1_4288_-_ctg1_4288&openApp=0   明星
-    #https://m.weibo.cn/api/container/getIndex?containerid=102803_ctg1_4388_-_ctg1_4388&openApp=0   搞笑
-    #https://m.weibo.cn/api/container/getIndex?containerid=102803_ctg1_1988_-_ctg1_1988&openApp=0   情感
-    #https://m.weibo.cn/api/container/getIndex?containerid=102803_ctg1_4288_-_ctg1_4288&openApp=0   明星
-    #https://m.weibo.cn/api/container/getIndex?containerid=102803_ctg1_4188_-_ctg1_4188&openApp=0   社会
-    #https://m.weibo.cn/api/container/getIndex?containerid=102803_ctg1_5088_-_ctg1_5088&openApp=0   数码
-    #https://m.weibo.cn/api/container/getIndex?containerid=102803_ctg1_1388_-_ctg1_1388&openApp=0   体育
-    #https://m.weibo.cn/api/container/getIndex?containerid=102803_ctg1_5188_-_ctg1_5188&openApp=0   汽车
-    #https://m.weibo.cn/api/container/getIndex?containerid=102803_ctg1_3288_-_ctg1_3288&openApp=0   电影
-    #https://m.weibo.cn/api/container/getIndex?containerid=102803_ctg1_4888_-_ctg1_4888&openApp=0   游戏
+

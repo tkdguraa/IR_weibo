@@ -88,7 +88,6 @@ if __name__ == '__main__':
     print('new Q:', Q)
 
     # filter irrelevant documents
-#    post_ids = get_candidates(orig_Q)
     post_ids = [line['post_id'] for line in lines]
 
     topN = 10    # num of documents to return

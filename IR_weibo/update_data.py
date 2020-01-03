@@ -105,8 +105,7 @@ def update_data(tweeter):
         tagIndex.update_tag_index(tag_dict)
         print("Inverted index length: %d" % len(invertedIndex.inverted_index))
         print("Tag index length: %d" % len(tagIndex.tag_index))
-        # print(invertedIndex.inverted_index)
-        # print(tagIndex.tag_index)
+
 
 
 
@@ -142,7 +141,6 @@ def read_data(tweeter):
                 text_dict[post_id] = text
                 tag_dict[post_id] = hash
                 user_dict[user['screen_name']] = user['followers_count']
-                # print(text_dict)
     except:
         pass
 
@@ -152,14 +150,14 @@ def read_data(tweeter):
     tagIndex.update_tag_index(tag_dict)
     print("Inverted index length: %d" %len(invertedIndex.inverted_index))
     print("Tag index length: %d" % len(tagIndex.tag_index))
-    # print(invertedIndex.inverted_index)
-    # print(tagIndex.tag_index)
+
 
 
 if __name__ == "__main__":
     #建立MongoDB数据库连接
     client = MongoClient('localhost',27017)
 
+<<<<<<< HEAD
     # for item in collection.find():
     # print(collection.count())
     if not args.update: # load pickle 建立数据库
@@ -173,12 +171,20 @@ if __name__ == "__main__":
 
         read_data(collection)
 
+=======
+    client.drop_database("weibodata")
+>>>>>>> upstream/master
 
     #连接所需数据库,test为数据库名
     db=client.weibodata
     #连接所用集合，也就是我们通常所说的表，test为表名
     collection=db.tweeter
 
+<<<<<<< HEAD
+=======
+    read_data(collection)
+
+>>>>>>> upstream/master
     while 1:
         update_data(collection)
         time.sleep(300)
