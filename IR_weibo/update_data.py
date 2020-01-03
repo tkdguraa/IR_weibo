@@ -157,13 +157,15 @@ if __name__ == "__main__":
     #建立MongoDB数据库连接
     client = MongoClient('localhost',27017)
 
-<<<<<<< HEAD
     # for item in collection.find():
     # print(collection.count())
     if not args.update: # load pickle 建立数据库
         # TODO:建数据库，建表
         # TODO:旧表如果存在，需要先drop out，再建表！！！
-
+        try:
+            client.drop_database("weibodata")
+        except Exception as e:
+            pass
         # 连接所需数据库,test为数据库名
         db = client.weibodata
         # 连接所用集合，也就是我们通常所说的表，test为表名
@@ -171,20 +173,12 @@ if __name__ == "__main__":
 
         read_data(collection)
 
-=======
-    client.drop_database("weibodata")
->>>>>>> upstream/master
 
     #连接所需数据库,test为数据库名
     db=client.weibodata
     #连接所用集合，也就是我们通常所说的表，test为表名
     collection=db.tweeter
 
-<<<<<<< HEAD
-=======
-    read_data(collection)
-
->>>>>>> upstream/master
     while 1:
         update_data(collection)
         time.sleep(300)
