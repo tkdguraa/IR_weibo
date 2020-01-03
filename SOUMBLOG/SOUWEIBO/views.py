@@ -122,9 +122,13 @@ def click_search(request, words, type):
         """
         Main Weibo Search API
         """
-        invi = search(words, algorithm='bert', topN=50, is_qe=False,
+        invi = search_tag(words, topN=50)
+        # print(words)
+        print('Tag count: %d' %len(invi))
+        if len(invi) < 50:
+            invi = search(words, algorithm='bm25', topN=50-len(invi), is_qe=False,
                       additional_attrs=['retweet_count', 'followers_count', 'post_id'],
-                      attr_params=[0.1, 0.1, 0.1])
+                      attr_params=[0.01, 0.01, 0.01])
 
         Q = preprocess_query(words, jieba.lcut_for_search)
 
